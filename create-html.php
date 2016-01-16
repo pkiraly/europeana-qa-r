@@ -59,7 +59,13 @@ foreach ($graphs as $name => $function) {
   $content .= "<h3>Basic statistics</h3>\n";
   $content .= "<table>\n";
   foreach (get_object_vars($assocStat[$name]) as $key => $value) {
-    $content .= sprintf("<tr><td>%s</td><td>%s</td>\n", $key, $value);
+    if ($key == 'recMin') {
+      $content .= sprintf("<tr><td>%s</td><td><a href=\"completenessTable.php?id=%s\">%s</a></td>\n", 'A record with minimal score', $value, $value);
+    } else if ($key == 'recMax') {
+      $content .= sprintf("<tr><td>%s</td><td><a href=\"completenessTable.php?id=%s\">%s</a></td>\n", 'A record with maximal score', $value, $value);
+    } else {
+      $content .= sprintf("<tr><td>%s</td><td>%s</td>\n", $key, $value);
+    }
   }
   $content .= "</table>\n";
 

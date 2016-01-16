@@ -1,8 +1,23 @@
+setMinMaxRecId <- function(stats, recordQuality, field) {
+  stats[field,"recMin"] <- head(recordQuality[recordQuality[field] == min(recordQuality[field]),2], 1)
+  stats[field,"recMax"] <- head(recordQuality[recordQuality[field] == max(recordQuality[field]),2], 1)
+  return(stats)
+}
+
 getFile <- function(args) {
   if (length(args) != 0 && args[1] != "") {
     file <- args[1]
   } else {
-    file <- '92027_Ag_EU_TEL_a0429E.xml'
+    file <- 'data/92027_Ag_EU_TEL_a0429E.xml.csv'
+  }
+  return(file)
+}
+
+getPath <- function(args) {
+  if (length(args) == 2 && args[2] != "") {
+    file <- args[2]
+  } else {
+    file <- 'data'
   }
   return(file)
 }
