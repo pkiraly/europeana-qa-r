@@ -23,7 +23,12 @@ getPath <- function(args) {
 }
 
 getId <- function(file) {
-  return(substr(file, 0, (regexpr('_', file) - 1)))
+  pos <- regexpr('_', file)
+  if (pos[1] != -1) {
+    return(substr(file, 0, (regexpr('_', file) - 1)))
+  } else {
+    return(substr(file, 0, (regexpr('.', file, fixed=TRUE) - 1)))
+  }
 }
 
 saveImage <- function(id, name, bar, box, qq) {
