@@ -9,6 +9,7 @@ getFile <- function(args) {
     file <- args[1]
   } else {
     file <- 'data/92027_Ag_EU_TEL_a0429E.xml.csv'
+    # file <- 'data/temp.csv'
   }
   return(file)
 }
@@ -23,7 +24,17 @@ getPath <- function(args) {
 }
 
 getId <- function(file) {
-  return(substr(file, 0, (regexpr('_', file) - 1)))
+  pos <- regexpr('_', file)
+  if (pos[1] != -1) {
+    return(substr(file, 0, (regexpr('_', file) - 1)))
+  } else {
+    pos <- regexpr('\\.', file)
+    if (pos[1] != -1) {
+      return(substr(file, 0, (regexpr('.', file, fixed=TRUE) - 1)))
+    } else {
+      return(file)
+    }
+  }
 }
 
 saveImage <- function(id, name, bar, box, qq) {
@@ -31,6 +42,7 @@ saveImage <- function(id, name, bar, box, qq) {
 
   png(paste('img/', id, '/', id, '-', name, '.png', sep=''), width=920, height=300)
   grid.arrange(bar, box, qq, ncol=3)
+  # grid.arrange(bar, ncol=1)
   dev.off()
 }
 
@@ -57,3 +69,9 @@ draw <- function(qa, fieldName, field) {
   grid.arrange(bar, box, qq, ncol=3)
   dev.off()
 }
+
+stopQuietly <- function(...) {
+  blankMsg <- sprintf("\r%s\r", paste(rep(" ", getOption("width")-1L),
+                                      collapse=" "));
+  stop(simpleError(blankMsg));
+} # stopQuietly()

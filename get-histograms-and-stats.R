@@ -40,7 +40,7 @@ rm(stats)
 # total
 bar <- ggplot(qa, aes(total)) + 
   theme(legend.position = "none") +
-  geom_histogram(aes(y=..density..), colour="black", fill="white") +
+  geom_histogram(aes(y=..density..), colour="black", fill="white", binwidth = 0.01) + #
   labs(title="Histogram", x="Total", y="Density") +
   stat_function(fun=dnorm, args=list(mean=mean(qa$total, na.rm = TRUE), sd=sd(qa$total, na.rm = TRUE)), colour="black", size=1) +
   scale_x_continuous(limits=c(0,1)) + 
@@ -52,7 +52,7 @@ box <- ggplot(qa, aes(x=collection, y=total)) +
   scale_fill_brewer(palette="RdBu") + theme_minimal() +
   scale_y_continuous(limits=c(0,1))
 
-qq <- qplot(sample = qa$total, stat = "qq") + 
+qq <- qplot(sample = qa$total) + stat_qq() +
   labs(title="Quantile plot", y="Total") +
   scale_fill_brewer(palette="RdBu") + theme_minimal() +
   scale_y_continuous(limits=c(0,1))
@@ -62,7 +62,7 @@ saveImage(id, 'total', bar, box, qq)
 # mandatory
 bar <- ggplot(qa, aes(mandatory)) + 
   theme(legend.position = "none") +
-  geom_histogram(aes(y=..density..), colour="black", fill="white") +
+  geom_histogram(aes(y=..density..), colour="black", fill="white", binwidth = 0.01) +
   labs(title="Histogram", x="Mandatory fields", y="Density") +
   stat_function(fun=dnorm, args=list(mean=mean(qa$mandatory, na.rm = TRUE), sd=sd(qa$mandatory, na.rm = TRUE)), colour="black", size=1) +
   scale_x_continuous(limits=c(0,1)) + 
@@ -74,7 +74,7 @@ box <- ggplot(qa, aes(x=collection, y=mandatory)) +
   scale_fill_brewer(palette="RdBu") + theme_minimal() +
   scale_y_continuous(limits=c(0,1))
 
-qq <- qplot(sample = qa$mandatory, stat = "qq") + 
+qq <- qplot(sample = qa$mandatory) + stat_qq() +
   labs(title="Quantile plot", y="Mandatory fields") +
   scale_fill_brewer(palette="RdBu") + theme_minimal() +
   scale_y_continuous(limits=c(0,1))
@@ -84,7 +84,7 @@ saveImage(id, 'mandatory', bar, box, qq)
 # descriptiveness
 bar <- ggplot(qa, aes(descriptiveness)) + 
   theme(legend.position = "none") +
-  geom_histogram(aes(y=..density..), colour="black", fill="white") +
+  geom_histogram(aes(y=..density..), colour="black", fill="white", binwidth = 0.01) +
   labs(title="Histogram", x="Descriptiveness", y="Density") +
   stat_function(fun=dnorm, args=list(mean=mean(qa$descriptiveness, na.rm = TRUE), sd=sd(qa$descriptiveness, na.rm = TRUE)), colour="black", size=1) +
   scale_x_continuous(limits=c(0,1)) + 
@@ -96,7 +96,7 @@ box <- ggplot(qa, aes(x=collection, y=descriptiveness)) +
   scale_fill_brewer(palette="RdBu") + theme_minimal() +
   scale_y_continuous(limits=c(0,1))
 
-qq <- qplot(sample = qa$descriptiveness, stat = "qq") + 
+qq <- qplot(sample = qa$descriptiveness) + stat_qq() +
   labs(title="Quantile plot", y="Descriptiveness") +
   scale_fill_brewer(palette="RdBu") + theme_minimal() +
   scale_y_continuous(limits=c(0,1))
@@ -106,7 +106,7 @@ saveImage(id, 'descriptiveness', bar, box, qq)
 # searchability
 bar <- ggplot(qa, aes(searchability)) + 
   theme(legend.position = "none") +
-  geom_histogram(aes(y=..density..), colour="black", fill="white") +
+  geom_histogram(aes(y=..density..), colour="black", fill="white", binwidth = 0.01) +
   labs(title="Histogram", x="Searchability", y="Density") +
   stat_function(fun=dnorm, args=list(mean=mean(qa$searchability, na.rm = TRUE), sd=sd(qa$searchability, na.rm = TRUE)), colour="black", size=1) +
   scale_x_continuous(limits=c(0,1)) + 
@@ -118,7 +118,7 @@ box <- ggplot(qa, aes(x=collection, y=searchability)) +
   scale_fill_brewer(palette="RdBu") + theme_minimal() +
   scale_y_continuous(limits=c(0,1))
 
-qq <- qplot(sample = qa$searchability, stat = "qq") + 
+qq <- qplot(sample = qa$searchability) + stat_qq() +
   labs(title="Quantile plot", y="Searchability") +
   scale_fill_brewer(palette="RdBu") + theme_minimal() +
   scale_y_continuous(limits=c(0,1))
@@ -128,7 +128,7 @@ saveImage(id, 'searchability', bar, box, qq)
 # contextualization
 bar <- ggplot(qa, aes(contextualization)) + 
   theme(legend.position = "none") +
-  geom_histogram(aes(y=..density..), colour="black", fill="white") +
+  geom_histogram(aes(y=..density..), colour="black", fill="white", binwidth = 0.01) +
   labs(title="Histogram", x="Contextualization", y="Density") +
   stat_function(fun=dnorm, args=list(mean=mean(qa$contextualization, na.rm = TRUE), sd=sd(qa$contextualization, na.rm = TRUE)), colour="black", size=1) +
   scale_x_continuous(limits=c(0,1)) + 
@@ -140,7 +140,7 @@ box <- ggplot(qa, aes(x=collection, y=contextualization)) +
   scale_fill_brewer(palette="RdBu") + theme_minimal() +
   scale_y_continuous(limits=c(0,1))
 
-qq <- qplot(sample = qa$contextualization, stat = "qq") + 
+qq <- qplot(sample = qa$contextualization) + stat_qq() +
   labs(title="Quantile plot", y="Contextualization") +
   scale_fill_brewer(palette="RdBu") + theme_minimal() +
   scale_y_continuous(limits=c(0,1))
@@ -150,7 +150,7 @@ saveImage(id, 'contextualization', bar, box, qq)
 # identification
 bar <- ggplot(qa, aes(identification)) + 
   theme(legend.position = "none") +
-  geom_histogram(aes(y=..density..), colour="black", fill="white") +
+  geom_histogram(aes(y=..density..), colour="black", fill="white", binwidth = 0.01) +
   labs(title="Histogram", x="Identification", y="Density") +
   stat_function(fun=dnorm, args=list(mean=mean(qa$identification, na.rm = TRUE), sd=sd(qa$identification, na.rm = TRUE)), colour="black", size=1) +
   scale_x_continuous(limits=c(0,1)) + 
@@ -162,7 +162,7 @@ box <- ggplot(qa, aes(x=collection, y=identification)) +
   scale_fill_brewer(palette="RdBu") + theme_minimal() +
   scale_y_continuous(limits=c(0,1))
 
-qq <- qplot(sample = qa$identification, stat = "qq") + 
+qq <- qplot(sample = qa$identification) + stat_qq() +
   labs(title="Quantile plot", y="Identification") +
   scale_fill_brewer(palette="RdBu") + theme_minimal() +
   scale_y_continuous(limits=c(0,1))
@@ -172,7 +172,7 @@ saveImage(id, 'identification', bar, box, qq)
 # browsing
 bar <- ggplot(qa, aes(browsing)) + 
   theme(legend.position = "none") +
-  geom_histogram(aes(y=..density..), colour="black", fill="white") +
+  geom_histogram(aes(y=..density..), colour="black", fill="white", binwidth = 0.01) +
   labs(title="Histogram", x="Browsing", y="Density") +
   stat_function(fun=dnorm, args=list(mean=mean(qa$browsing, na.rm = TRUE), sd=sd(qa$browsing, na.rm = TRUE)), colour="black", size=1) +
   scale_x_continuous(limits=c(0,1)) + 
@@ -184,7 +184,7 @@ box <- ggplot(qa, aes(x=collection, y=browsing)) +
   scale_fill_brewer(palette="RdBu") + theme_minimal() +
   scale_y_continuous(limits=c(0,1))
 
-qq <- qplot(sample = qa$browsing, stat = "qq") + 
+qq <- qplot(sample = qa$browsing) + stat_qq() +
   labs(title="Quantile plot", y="Browsing") +
   scale_fill_brewer(palette="RdBu") + theme_minimal() +
   scale_y_continuous(limits=c(0,1))
@@ -194,7 +194,7 @@ saveImage(id, 'browsing', bar, box, qq)
 # viewing
 bar <- ggplot(qa, aes(viewing)) + 
   theme(legend.position = "none") +
-  geom_histogram(aes(y=..density..), colour="black", fill="white") +
+  geom_histogram(aes(y=..density..), colour="black", fill="white", binwidth = 0.01) +
   labs(title="Histogram", x="Viewing", y="Density") +
   stat_function(fun=dnorm, args=list(mean=mean(qa$viewing, na.rm = TRUE), sd=sd(qa$viewing, na.rm = TRUE)), colour="black", size=1) +
   scale_x_continuous(limits=c(0,1)) + 
@@ -206,7 +206,7 @@ box <- ggplot(qa, aes(x=collection, y=viewing)) +
   scale_fill_brewer(palette="RdBu") + theme_minimal() +
   scale_y_continuous(limits=c(0,1))
 
-qq <- qplot(sample = qa$viewing, stat = "qq") + 
+qq <- qplot(sample = qa$viewing) + stat_qq() +
   labs(title="Quantile plot", y="Viewing") +
   scale_fill_brewer(palette="RdBu") + theme_minimal() +
   scale_y_continuous(limits=c(0,1))
@@ -216,7 +216,7 @@ saveImage(id, 'viewing', bar, box, qq)
 # 'reusability',
 bar <- ggplot(qa, aes(reusability)) + 
   theme(legend.position = "none") +
-  geom_histogram(aes(y=..density..), colour="black", fill="white") +
+  geom_histogram(aes(y=..density..), colour="black", fill="white", binwidth = 0.01) +
   labs(title="Histogram", x="Reusability", y="Density") +
   stat_function(fun=dnorm, args=list(mean=mean(qa$reusability, na.rm = TRUE), sd=sd(qa$reusability, na.rm = TRUE)), colour="black", size=1) +
   scale_x_continuous(limits=c(0,1)) + 
@@ -228,7 +228,7 @@ box <- ggplot(qa, aes(x=collection, y=reusability)) +
   scale_fill_brewer(palette="RdBu") + theme_minimal() +
   scale_y_continuous(limits=c(0,1))
 
-qq <- qplot(sample = qa$reusability, stat = "qq") + 
+qq <- qplot(sample = qa$reusability) + stat_qq() +
   labs(title="Quantile plot", y="Reusability") +
   scale_fill_brewer(palette="RdBu") + theme_minimal() +
   scale_y_continuous(limits=c(0,1))
@@ -238,7 +238,7 @@ saveImage(id, 'reusability', bar, box, qq)
 # multilinguality
 bar <- ggplot(qa, aes(multilinguality)) + 
   theme(legend.position = "none") +
-  geom_histogram(aes(y=..density..), colour="black", fill="white") +
+  geom_histogram(aes(y=..density..), colour="black", fill="white", binwidth = 0.01) +
   labs(title="Histogram", x="Multilinguality", y="Density") +
   stat_function(fun=dnorm, args=list(mean=mean(qa$multilinguality, na.rm = TRUE), sd=sd(qa$multilinguality, na.rm = TRUE)), colour="black", size=1) +
   scale_x_continuous(limits=c(0,1)) + 
@@ -250,7 +250,7 @@ box <- ggplot(qa, aes(x=collection, y=multilinguality)) +
   scale_fill_brewer(palette="RdBu") + theme_minimal() +
   scale_y_continuous(limits=c(0,1))
 
-qq <- qplot(sample = qa$multilinguality, stat = "qq") + 
+qq <- qplot(sample = qa$multilinguality) + stat_qq() +
   labs(title="Quantile plot", y="Multilinguality") +
   scale_fill_brewer(palette="RdBu") + theme_minimal() +
   scale_y_continuous(limits=c(0,1))
