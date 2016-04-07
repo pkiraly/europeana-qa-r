@@ -1,6 +1,8 @@
 setMinMaxRecId <- function(stats, recordQuality, field) {
-  stats[field,"recMin"] <- head(recordQuality[recordQuality[field] == min(recordQuality[field]),2], 1)
-  stats[field,"recMax"] <- head(recordQuality[recordQuality[field] == max(recordQuality[field]),2], 1)
+  recMin <- head(recordQuality[recordQuality[field] == min(recordQuality[field]),3], 1)
+  stats[field,"recMin"] <- recMin
+  recMax <- head(recordQuality[recordQuality[field] == max(recordQuality[field]),3], 1)
+  stats[field,"recMax"] <- recMax
   return(stats)
 }
 

@@ -7,15 +7,51 @@ library(jsonlite)
 source("draw.R")
 
 path <- getFile(commandArgs(trailingOnly=TRUE))
+print(path)
 parts <- unlist(strsplit(path, '/', fixed = TRUE))
 file <- parts[length(parts)]
 id <- getId(file)
 jsonPath <- getPath(commandArgs(trailingOnly=TRUE))
 
-col_names <- c('collection', 'id', 'total', 'mandatory', 'descriptiveness', 'searchability', 
+col_names <- c('provider', 'collection', 'id', 'total', 'mandatory', 'descriptiveness', 'searchability', 
                'contextualization', 'identification', 'browsing', 'viewing', 'reusability',
                'multilinguality')
-qa <- read_csv(path, col_types = "ccnnnnnnnnnn", col_names = col_names);
+has_fields <- c('identifier', 'proxy_dc_title', 'proxy_dcterms_alternative', 
+               'proxy_dc_description', 'proxy_dc_creator', 'proxy_dc_publisher', 'proxy_dc_contributor',
+               'proxy_dc_type', 'proxy_dc_identifier', 'proxy_dc_language', 'proxy_dc_coverage',
+               'proxy_dcterms_temporal', 'proxy_dcterms_spatial', 'proxy_dc_subject', 'proxy_dc_date',
+               'proxy_dcterms_created', 'proxy_dcterms_issued', 'proxy_dcterms_extent', 'proxy_dcterms_medium',
+               'proxy_dcterms_provenance', 'proxy_dcterms_hasPart', 'proxy_dcterms_isPartOf', 'proxy_dc_format',
+               'proxy_dc_source', 'proxy_dc_rights', 'proxy_dc_relation', 'proxy_edm_isNextInSequence',
+               'proxy_edm_type', 'aggregation_edm_rights', 'aggregation_edm_provider',
+               'aggregation_edm_dataProvider', 'aggregation_edm_isShownAt', 'aggregation_edm_isShownBy',
+               'aggregation_edm_object', 'aggregation_edm_hasView');
+
+all_cols <- c(col_names, has_fields)
+
+qa <- read_csv(path, col_types = "cccnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnn", col_names = all_cols);
+
+frequencies <- read.table(text = "", colClasses = c("character", "numeric", 'numeric'), col.names = c('field', 'count', 'frequency'))
+
+for (fieldName in has_fields) {
+  countTable <- table(qa[fieldName])
+  countFrame <- data.frame(countTable)
+  countVal <-countFrame[countFrame$Var1 == 1,c('Freq')]
+  if (length(countVal) == 0) {
+    countVal <- 0
+  }
+
+  freqFrame <- data.frame(prop.table(countTable))
+  freqVal <-freqFrame[freqFrame$Var1 == 1,c('Freq')]
+  if (length(freqVal) == 0) {
+    freqVal <- 0
+  }
+
+  frequencies <- rbind(frequencies, data.frame(field = fieldName, count = countVal, frequency = freqVal)) 
+}
+exportJson <- toJSON(frequencies)
+write(exportJson, paste('json/', id, ".freq.json", sep=""))
+rm(frequencies)
 
 stats <- round(
           stat.desc(
@@ -24,11 +60,13 @@ stats <- round(
                 'contextualization', 'identification', 'browsing', 'viewing', 'reusability',
                 'multilinguality')], basic=TRUE), digits=3)
 
+
+
 stats <- stats[!(rownames(stats) %in% c("nbr.val", "nbr.null", "nbr.na", "sum")),]
 stats <- data.frame(t(stats))
 
 for (name in col_names) {
-  if (name != 'collection' && name != 'id') {
+  if (name != 'provider' && name != 'collection' && name != 'id') {
     stats <- setMinMaxRecId(stats, qa, name)
   }
 }
@@ -41,19 +79,19 @@ rm(stats)
 bar <- ggplot(qa, aes(total)) + 
   theme(legend.position = "none") +
   geom_histogram(aes(y=..density..), colour="black", fill="white", binwidth = 0.01) + #
-  labs(title="Histogram", x="Total", y="Density") +
+  labs(title="Histogram", x="Every fields", y="Density") +
   stat_function(fun=dnorm, args=list(mean=mean(qa$total, na.rm = TRUE), sd=sd(qa$total, na.rm = TRUE)), colour="black", size=1) +
   scale_x_continuous(limits=c(0,1)) + 
   scale_fill_brewer(palette="RdBu") + theme_minimal()
 
 box <- ggplot(qa, aes(x=collection, y=total)) +
-  geom_boxplot() + labs(title="Boxplot", x="Collection", y="Total") +
+  geom_boxplot() + labs(title="Boxplot", x="Collection", y="Every fields") +
   geom_jitter(shape=16, position=position_jitter(0.2)) + 
   scale_fill_brewer(palette="RdBu") + theme_minimal() +
   scale_y_continuous(limits=c(0,1))
 
 qq <- qplot(sample = qa$total) + stat_qq() +
-  labs(title="Quantile plot", y="Total") +
+  labs(title="Quantile plot", y="Every fields") +
   scale_fill_brewer(palette="RdBu") + theme_minimal() +
   scale_y_continuous(limits=c(0,1))
 
