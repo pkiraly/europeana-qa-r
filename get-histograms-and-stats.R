@@ -9,24 +9,43 @@ source("draw.R")
 args <- commandArgs(trailingOnly=TRUE)
 
 path <- getFile(args[1])
-print(path)
+print(paste('path:', path))
 parts <- unlist(strsplit(path, '/', fixed = TRUE))
 file <- parts[length(parts)]
 id <- getId(file)
 
 jsonPath <- getPath(args[1])
 
-drawGraph <- as.logical(args[2])
-if (is.na(drawGraph)) {
-  drawGraph <- FALSE
+drawCompletenessGraph <- as.logical(args[2])
+if (is.na(drawCompletenessGraph)) {
+  drawCompletenessGraph <- FALSE
 }
-print(drawGraph)
+print(paste(path, 'draw completeness graph:', drawCompletenessGraph))
 
-id_names <- c('provider', 'collection', 'id')
-col_names <- c('total', 'mandatory', 'descriptiveness', 'searchability', 
-               'contextualization', 'identification', 'browsing', 'viewing', 'reusability',
-               'multilinguality')
-has_fields <- c('identifier', 'proxy_dc_title', 'proxy_dcterms_alternative', 
+drawEntropyGraph <- as.logical(args[3])
+if (is.na(drawEntropyGraph)) {
+  drawEntropyGraph <- FALSE
+}
+print(paste(path, 'draw entropy graph:', drawEntropyGraph))
+
+doFrequencies <- as.logical(args[4])
+if (is.na(doFrequencies)) {
+  doFrequencies <- FALSE
+}
+print(paste(path, 'doFrequencies:', doFrequencies))
+
+#id_fields <- c('collection')
+id_fields <- c('provider', 'collection', 'id')
+id_types <- paste(rep('c', length(id_fields)), collapse='')
+
+completeness_fields <- c(
+  'total', 'mandatory', 'descriptiveness', 'searchability',
+  'contextualization', 'identification', 'browsing', 'viewing', 'reusability',
+  'multilinguality'
+)
+completeness_types <- paste(rep('n', length(completeness_fields)), collapse='')
+
+has_a_fields <- c('identifier', 'proxy_dc_title', 'proxy_dcterms_alternative', 
                'proxy_dc_description', 'proxy_dc_creator', 'proxy_dc_publisher', 'proxy_dc_contributor',
                'proxy_dc_type', 'proxy_dc_identifier', 'proxy_dc_language', 'proxy_dc_coverage',
                'proxy_dcterms_temporal', 'proxy_dcterms_spatial', 'proxy_dc_subject', 'proxy_dc_date',
@@ -36,51 +55,64 @@ has_fields <- c('identifier', 'proxy_dc_title', 'proxy_dcterms_alternative',
                'proxy_edm_type', 'aggregation_edm_rights', 'aggregation_edm_provider',
                'aggregation_edm_dataProvider', 'aggregation_edm_isShownAt', 'aggregation_edm_isShownBy',
                'aggregation_edm_object', 'aggregation_edm_hasView');
-entropy_names <- c('entropy_dc_title_sum', 'entropy_dc_title_avg',
+has_a_types <- paste(rep('n', length(has_a_fields)), collapse='')
+
+entropy_fields <- c('entropy_dc_title_sum', 'entropy_dc_title_avg',
                'entropy_dcterms_alternative_sum', 'entropy_dcterms_alternative_avg',
                'entropy_dc_description_sum', 'entropy_dc_description_avg');
+entropy_types <- paste(rep('n', length(entropy_fields)), collapse='')
 
-all_cols <- c(id_names, col_names, has_fields, entropy_names)
+# all_fields <- c(id_fields, completeness_fields)
+all_fields <- c(id_fields, completeness_fields, has_a_fields, entropy_fields)
+# all_types <- paste(id_types, completeness_types, sep='')
+all_types <- paste(id_types,  completeness_types,  has_a_types,  entropy_types, sep='')
 
-qa <- read_csv(path, col_types = 'cccnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnn', col_names = all_cols);
+qa <- read_csv(path, col_types = all_types, col_names = all_fields);
 
-nrow(qa)
+sum <- nrow(qa)
+
+print(paste(path, 'total records:', sum))
+
 collector <- list()
 
-count <- c(nrow(qa))
+count <- c(sum)
 names(count) <- c('count')
 count <- data.frame(count)
-collector[["count"]][['count']] <- nrow(qa)
+collector[["count"]][['count']] <- sum
 exportJson <- toJSON(count)
 write(exportJson, paste('json/', id, ".count.json", sep=""))
 rm(count)
 
+print(paste(path, "calculate field frequencies"))
 # STARTS field existency process
-frequencies <- read.table(text = '', colClasses = c("character", "numeric", 'numeric'), col.names = c('field', 'count', 'frequency'))
+if (doFrequencies) {
+  frequencies <- read.table(text = '', colClasses = c("character", "numeric", 'numeric'), col.names = c('field', 'count', 'frequency'))
 
-for (fieldName in has_fields) {
-  countTable <- table(qa[fieldName])
-  countFrame <- data.frame(countTable)
-  countVal <-countFrame[countFrame$Var1 == 1,c('Freq')]
-  if (length(countVal) == 0) {
-    countVal <- 0
+  for (fieldName in has_a_fields) {
+    countTable <- table(qa[fieldName])
+    countFrame <- data.frame(countTable)
+    countVal <-countFrame[countFrame$Var1 == 1,c('Freq')]
+    if (length(countVal) == 0) {
+      countVal <- 0
+    }
+
+    freqFrame <- data.frame(prop.table(countTable))
+    freqVal <-freqFrame[freqFrame$Var1 == 1,c('Freq')]
+    if (length(freqVal) == 0) {
+      freqVal <- 0
+    }
+
+    frequencies <- rbind(frequencies, data.frame(field = fieldName, count = countVal, frequency = freqVal)) 
   }
-
-  freqFrame <- data.frame(prop.table(countTable))
-  freqVal <-freqFrame[freqFrame$Var1 == 1,c('Freq')]
-  if (length(freqVal) == 0) {
-    freqVal <- 0
-  }
-
-  frequencies <- rbind(frequencies, data.frame(field = fieldName, count = countVal, frequency = freqVal)) 
+  collector[["frequencies"]] <- frequencies
+  exportJson <- toJSON(frequencies)
+  write(exportJson, paste('json/', id, ".freq.json", sep=""))
+  rm(frequencies)
 }
-collector[["frequencies"]] <- frequencies
-exportJson <- toJSON(frequencies)
-write(exportJson, paste('json/', id, ".freq.json", sep=""))
-rm(frequencies)
 # ENDS field existency process
 
-stat_names <- c(col_names, entropy_names)
+print(paste(path, "basic statistics"))
+stat_names <- c(completeness_fields, entropy_fields)
 stats <- round(stat.desc(qa[,stat_names], basic=TRUE), digits=4)
 
 stats <- stats[!(rownames(stats) %in% c("nbr.val", "nbr.null", "nbr.na", "sum")),]
@@ -94,6 +126,7 @@ exportJson <- toJSON(stats)
 write(exportJson, paste('json/', id, ".json", sep=""))
 rm(stats)
 
+print(paste(path, "histograms"))
 histograms <- list()
 for (name in stat_names) {
   h <- hist(qa[,c(name)], plot = FALSE, breaks = 8)
@@ -101,7 +134,8 @@ for (name in stat_names) {
                      stringsAsFactors = FALSE)
   for (i in 1:length(h$counts)) {
     label <- paste(h$breaks[i], h$breaks[i + 1], sep = " - ")
-    hist[i, ] <- c(label, h$counts[i], h$density[i])
+    density <- h$counts[i] * 100 / sum
+    hist[i, ] <- c(label, h$counts[i], density)
   }
   histograms[[name]] <- hist
 }
@@ -114,35 +148,34 @@ exportJson <- toJSON(collector)
 write(exportJson, paste('json/', id, ".collector.json", sep=""))
 rm(collector)
 
-if (drawGraph == FALSE) {
-  stop("Skipping graph creation")
+if (drawCompletenessGraph == TRUE) {
+  # total
+  print(paste(path, "drawing total"))
+  bar <- ggplot(qa, aes(total)) + 
+    theme(legend.position = "none") +
+    geom_histogram(aes(y=..density..), colour="black", fill="white", binwidth = 0.01) + #
+    labs(title="Histogram", x="Every fields", y="Density (%)") +
+    stat_function(fun=dnorm, args=list(mean=mean(qa$total, na.rm = TRUE), sd=sd(qa$total, na.rm = TRUE)), colour="black", size=1) +
+    scale_x_continuous(limits=c(0,1)) + 
+    scale_fill_brewer(palette="RdBu") + theme_minimal()
+
+  box <- ggplot(qa, aes(x=collection, y=total)) +
+    geom_boxplot() + labs(title="Boxplot", x="Collection", y="Every fields") +
+    # geom_jitter(shape=16, position=position_jitter(0.2)) + 
+    scale_fill_brewer(palette="RdBu") + theme_minimal() +
+    scale_y_continuous(limits=c(0,1))
+
+  qq <- qplot(sample = qa$total) + stat_qq() +
+    labs(title="Quantile plot", y="Every fields") +
+    scale_fill_brewer(palette="RdBu") + theme_minimal() +
+    scale_y_continuous(limits=c(0,1))
+
+  saveImage(id, 'total', bar, box, qq)
 }
 
-# total
-print("drawing total")
-bar <- ggplot(qa, aes(total)) + 
-  theme(legend.position = "none") +
-  geom_histogram(aes(y=..density..), colour="black", fill="white", binwidth = 0.01) + #
-  labs(title="Histogram", x="Every fields", y="Density (%)") +
-  stat_function(fun=dnorm, args=list(mean=mean(qa$total, na.rm = TRUE), sd=sd(qa$total, na.rm = TRUE)), colour="black", size=1) +
-  scale_x_continuous(limits=c(0,1)) + 
-  scale_fill_brewer(palette="RdBu") + theme_minimal()
-
-box <- ggplot(qa, aes(x=collection, y=total)) +
-  geom_boxplot() + labs(title="Boxplot", x="Collection", y="Every fields") +
-  # geom_jitter(shape=16, position=position_jitter(0.2)) + 
-  scale_fill_brewer(palette="RdBu") + theme_minimal() +
-  scale_y_continuous(limits=c(0,1))
-
-qq <- qplot(sample = qa$total) + stat_qq() +
-  labs(title="Quantile plot", y="Every fields") +
-  scale_fill_brewer(palette="RdBu") + theme_minimal() +
-  scale_y_continuous(limits=c(0,1))
-
-saveImage(id, 'total', bar, box, qq)
-
 # mandatory
-print("drawing mandatory")
+if (drawCompletenessGraph == TRUE) {
+print(paste(path, "drawing mandatory"))
 bar <- ggplot(qa, aes(mandatory)) + 
   theme(legend.position = "none") +
   geom_histogram(aes(y=..density..), colour="black", fill="white", binwidth = 0.01) +
@@ -163,9 +196,11 @@ qq <- qplot(sample = qa$mandatory) + stat_qq() +
   scale_y_continuous(limits=c(0,1))
 
 saveImage(id, 'mandatory', bar, box, qq)
+}
 
 # descriptiveness
-print("drawing descriptiveness")
+if (drawCompletenessGraph == TRUE) {
+print(paste(path, "drawing descriptiveness"))
 bar <- ggplot(qa, aes(descriptiveness)) + 
   theme(legend.position = "none") +
   geom_histogram(aes(y=..density..), colour="black", fill="white", binwidth = 0.01) +
@@ -186,9 +221,11 @@ qq <- qplot(sample = qa$descriptiveness) + stat_qq() +
   scale_y_continuous(limits=c(0,1))
 
 saveImage(id, 'descriptiveness', bar, box, qq)
+}
 
 # searchability
-print("drawing searchability")
+if (drawCompletenessGraph == TRUE) {
+print(paste(path, "drawing searchability"))
 bar <- ggplot(qa, aes(searchability)) + 
   theme(legend.position = "none") +
   geom_histogram(aes(y=..density..), colour="black", fill="white", binwidth = 0.01) +
@@ -209,9 +246,11 @@ qq <- qplot(sample = qa$searchability) + stat_qq() +
   scale_y_continuous(limits=c(0,1))
 
 saveImage(id, 'searchability', bar, box, qq)
+}
 
 # contextualization
-print("drawing contextualization")
+if (drawCompletenessGraph == TRUE) {
+print(paste(path, "drawing contextualization"))
 bar <- ggplot(qa, aes(contextualization)) + 
   theme(legend.position = "none") +
   geom_histogram(aes(y=..density..), colour="black", fill="white", binwidth = 0.01) +
@@ -232,9 +271,11 @@ qq <- qplot(sample = qa$contextualization) + stat_qq() +
   scale_y_continuous(limits=c(0,1))
 
 saveImage(id, 'contextualization', bar, box, qq)
+}
 
 # identification
-print("drawing identification")
+if (drawCompletenessGraph == TRUE) {
+print(paste(path, "drawing identification"))
 bar <- ggplot(qa, aes(identification)) + 
   theme(legend.position = "none") +
   geom_histogram(aes(y=..density..), colour="black", fill="white", binwidth = 0.01) +
@@ -255,9 +296,11 @@ qq <- qplot(sample = qa$identification) + stat_qq() +
   scale_y_continuous(limits=c(0,1))
 
 saveImage(id, 'identification', bar, box, qq)
+}
 
 # browsing
-print("drawing browsing")
+if (drawCompletenessGraph == TRUE) {
+print(paste(path, "drawing browsing"))
 bar <- ggplot(qa, aes(browsing)) + 
   theme(legend.position = "none") +
   geom_histogram(aes(y=..density..), colour="black", fill="white", binwidth = 0.01) +
@@ -278,9 +321,11 @@ qq <- qplot(sample = qa$browsing) + stat_qq() +
   scale_y_continuous(limits=c(0,1))
 
 saveImage(id, 'browsing', bar, box, qq)
+}
 
 # viewing
-print("drawing viewing")
+if (drawCompletenessGraph == TRUE) {
+print(paste(path, "drawing viewing"))
 bar <- ggplot(qa, aes(viewing)) + 
   theme(legend.position = "none") +
   geom_histogram(aes(y=..density..), colour="black", fill="white", binwidth = 0.01) +
@@ -301,9 +346,11 @@ qq <- qplot(sample = qa$viewing) + stat_qq() +
   scale_y_continuous(limits=c(0,1))
 
 saveImage(id, 'viewing', bar, box, qq)
+}
 
 # 'reusability'
-print("drawing 'reusability'")
+if (drawCompletenessGraph == TRUE) {
+print(paste(path, "drawing 'reusability'"))
 bar <- ggplot(qa, aes(reusability)) + 
   theme(legend.position = "none") +
   geom_histogram(aes(y=..density..), colour="black", fill="white", binwidth = 0.01) +
@@ -324,36 +371,40 @@ qq <- qplot(sample = qa$reusability) + stat_qq() +
   scale_y_continuous(limits=c(0,1))
 
 saveImage(id, 'reusability', bar, box, qq)
+}
 
 # multilinguality
-print("drawing multilinguality")
-bar <- ggplot(qa, aes(multilinguality)) + 
-  theme(legend.position = "none") +
-  geom_histogram(aes(y=..density..), colour="black", fill="white", binwidth = 0.01) +
-  labs(title="Histogram", x="Multilinguality", y="Density (%)") +
-  stat_function(fun=dnorm, args=list(mean=mean(qa$multilinguality, na.rm = TRUE), sd=sd(qa$multilinguality, na.rm = TRUE)), colour="black", size=1) +
-  scale_x_continuous(limits=c(0,1)) + 
-  scale_fill_brewer(palette="RdBu") + theme_minimal()
+if (drawCompletenessGraph == TRUE) {
+  print(paste(path, "drawing multilinguality"))
+  bar <- ggplot(qa, aes(multilinguality)) + 
+    theme(legend.position = "none") +
+    geom_histogram(aes(y=..density..), colour="black", fill="white", binwidth = 0.01) +
+    labs(title="Histogram", x="Multilinguality", y="Density (%)") +
+    stat_function(fun=dnorm, args=list(mean=mean(qa$multilinguality, na.rm = TRUE), sd=sd(qa$multilinguality, na.rm = TRUE)), colour="black", size=1) +
+    scale_x_continuous(limits=c(0,1)) + 
+    scale_fill_brewer(palette="RdBu") + theme_minimal()
 
-box <- ggplot(qa, aes(x=collection, y=multilinguality)) +
-  geom_boxplot() + labs(title="Boxplot", x="Collection", y="Multilinguality") +
-  # geom_jitter(shape=16, position=position_jitter(0.2)) + 
-  scale_fill_brewer(palette="RdBu") + theme_minimal() +
-  scale_y_continuous(limits=c(0,1))
+  box <- ggplot(qa, aes(x=collection, y=multilinguality)) +
+    geom_boxplot() + labs(title="Boxplot", x="Collection", y="Multilinguality") +
+    # geom_jitter(shape=16, position=position_jitter(0.2)) + 
+    scale_fill_brewer(palette="RdBu") + theme_minimal() +
+    scale_y_continuous(limits=c(0,1))
 
-qq <- qplot(sample = qa$multilinguality) + stat_qq() +
-  labs(title="Quantile plot", y="Multilinguality") +
-  scale_fill_brewer(palette="RdBu") + theme_minimal() +
-  scale_y_continuous(limits=c(0,1))
+  qq <- qplot(sample = qa$multilinguality) + stat_qq() +
+    labs(title="Quantile plot", y="Multilinguality") +
+    scale_fill_brewer(palette="RdBu") + theme_minimal() +
+    scale_y_continuous(limits=c(0,1))
 
-saveImage(id, 'multilinguality', bar, box, qq)
+  saveImage(id, 'multilinguality', bar, box, qq)
+}
 
 ################################
 # drawing entropy fields
 ################################
 
 # entropy_dc_title_sum
-print("drawing entropy_dc_title_sum")
+if (drawEntropyGraph == TRUE) {
+print(paste(path, "drawing entropy_dc_title_sum"))
 bar <- ggplot(qa, aes(entropy_dc_title_sum)) + 
   theme(legend.position = "none") +
   geom_histogram(aes(y=..density..), colour="black", fill="white", binwidth = 0.01) +
@@ -374,9 +425,11 @@ qq <- qplot(sample = qa$entropy_dc_title_sum) + stat_qq() +
   # scale_y_continuous(limits=c(0,1))
 
 saveImage(id, 'entropy_dc_title_sum', bar, box, qq)
+}
 
 # entropy_dc_title_avg
-print("drawing entropy_dc_title_avg")
+if (drawEntropyGraph == TRUE) {
+print(paste(path, "drawing entropy_dc_title_avg"))
 bar <- ggplot(qa, aes(entropy_dc_title_avg)) + 
   theme(legend.position = "none") +
   geom_histogram(aes(y=..density..), colour="black", fill="white", binwidth = 0.01) +
@@ -397,9 +450,11 @@ qq <- qplot(sample = qa$entropy_dc_title_avg) + stat_qq() +
   # scale_y_continuous(limits=c(0,1))
 
 saveImage(id, 'entropy_dc_title_avg', bar, box, qq)
+}
 
 # entropy_dcterms_alternative_sum
-print("drawing entropy_dcterms_alternative_sum")
+if (drawEntropyGraph == TRUE) {
+print(paste(path, "drawing entropy_dcterms_alternative_sum"))
 bar <- ggplot(qa, aes(entropy_dcterms_alternative_sum)) + 
   theme(legend.position = "none") +
   geom_histogram(aes(y=..density..), colour="black", fill="white", binwidth = 0.01) +
@@ -420,9 +475,11 @@ qq <- qplot(sample = qa$entropy_dcterms_alternative_sum) + stat_qq() +
   # scale_y_continuous(limits=c(0,1))
 
 saveImage(id, 'entropy_dcterms_alternative_sum', bar, box, qq)
+}
 
 # entropy_dcterms_alternative_avg
-print("drawing entropy_dcterms_alternative_avg")
+if (drawEntropyGraph == TRUE) {
+print(paste(path, "drawing entropy_dcterms_alternative_avg"))
 bar <- ggplot(qa, aes(entropy_dcterms_alternative_avg)) + 
   theme(legend.position = "none") +
   geom_histogram(aes(y=..density..), colour="black", fill="white", binwidth = 0.01) +
@@ -443,9 +500,11 @@ qq <- qplot(sample = qa$entropy_dcterms_alternative_avg) + stat_qq() +
   # scale_y_continuous(limits=c(0,1))
 
 saveImage(id, 'entropy_dcterms_alternative_avg', bar, box, qq)
+}
 
 # entropy_dc_description_sum
-print("drawing entropy_dc_description_sum")
+if (drawEntropyGraph == TRUE) {
+print(paste(path, "drawing entropy_dc_description_sum"))
 bar <- ggplot(qa, aes(entropy_dc_description_sum)) + 
   theme(legend.position = "none") +
   geom_histogram(aes(y=..density..), colour="black", fill="white", binwidth = 0.01) +
@@ -466,29 +525,32 @@ qq <- qplot(sample = qa$entropy_dc_description_sum) + stat_qq() +
   # scale_y_continuous(limits=c(0,1))
 
 saveImage(id, 'entropy_dc_description_sum', bar, box, qq)
+}
 
 # entropy_dc_description_avg
-print("drawing entropy_dc_description_avg")
-bar <- ggplot(qa, aes(entropy_dc_description_avg)) + 
-  theme(legend.position = "none") +
-  geom_histogram(aes(y=..density..), colour="black", fill="white", binwidth = 0.01) +
-  labs(title="Histogram", x="dc:description average", y="Density (%)") +
-  stat_function(fun=dnorm, args=list(mean=mean(qa$entropy_dc_description_avg, na.rm = TRUE), sd=sd(qa$entropy_dc_description_avg, na.rm = TRUE)), colour="black", size=1) +
-  # scale_x_continuous(limits=c(0,1)) + 
-  scale_fill_brewer(palette="RdBu") + theme_minimal()
+if (drawEntropyGraph == TRUE) {
+  print(paste(path, "drawing entropy_dc_description_avg"))
+  bar <- ggplot(qa, aes(entropy_dc_description_avg)) + 
+    theme(legend.position = "none") +
+    geom_histogram(aes(y=..density..), colour="black", fill="white", binwidth = 0.01) +
+    labs(title="Histogram", x="dc:description average", y="Density (%)") +
+    stat_function(fun=dnorm, args=list(mean=mean(qa$entropy_dc_description_avg, na.rm = TRUE), sd=sd(qa$entropy_dc_description_avg, na.rm = TRUE)), colour="black", size=1) +
+    # scale_x_continuous(limits=c(0,1)) + 
+    scale_fill_brewer(palette="RdBu") + theme_minimal()
 
-box <- ggplot(qa, aes(x=collection, y=entropy_dc_description_avg)) +
-  geom_boxplot() + labs(title="Boxplot", x="Collection", y="dc:description average") +
-  # geom_jitter(shape=16, position=position_jitter(0.2)) + 
-  scale_fill_brewer(palette="RdBu") + theme_minimal()
-  # scale_y_continuous(limits=c(0,1))
+  box <- ggplot(qa, aes(x=collection, y=entropy_dc_description_avg)) +
+    geom_boxplot() + labs(title="Boxplot", x="Collection", y="dc:description average") +
+    # geom_jitter(shape=16, position=position_jitter(0.2)) + 
+    scale_fill_brewer(palette="RdBu") + theme_minimal()
+    # scale_y_continuous(limits=c(0,1))
 
-qq <- qplot(sample = qa$entropy_dc_description_avg) + stat_qq() +
-  labs(title="Quantile plot", y="dc:description average") +
-  scale_fill_brewer(palette="RdBu") + theme_minimal()
-  # scale_y_continuous(limits=c(0,1))
+  qq <- qplot(sample = qa$entropy_dc_description_avg) + stat_qq() +
+    labs(title="Quantile plot", y="dc:description average") +
+    scale_fill_brewer(palette="RdBu") + theme_minimal()
+    # scale_y_continuous(limits=c(0,1))
 
-saveImage(id, 'entropy_dc_description_avg', bar, box, qq)
+  saveImage(id, 'entropy_dc_description_avg', bar, box, qq)
+}
 
+print(paste(path, "Finished"))
 rm(list=ls())
-print("Finished")
