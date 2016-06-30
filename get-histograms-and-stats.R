@@ -13,6 +13,7 @@ print(paste('path:', path))
 parts <- unlist(strsplit(path, '/', fixed = TRUE))
 file <- parts[length(parts)]
 id <- getId(file)
+print(paste('id:', id))
 
 jsonPath <- getPath(args[1])
 
@@ -35,7 +36,7 @@ if (is.na(doFrequencies)) {
 print(paste(path, 'doFrequencies:', doFrequencies))
 
 #id_fields <- c('collection')
-id_fields <- c('provider', 'collection', 'id')
+id_fields <- c( 'id', 'provider', 'collection')
 id_types <- paste(rep('c', length(id_fields)), collapse='')
 
 completeness_fields <- c(
@@ -46,20 +47,21 @@ completeness_fields <- c(
 completeness_types <- paste(rep('n', length(completeness_fields)), collapse='')
 
 has_a_fields <- c('identifier', 'proxy_dc_title', 'proxy_dcterms_alternative', 
-               'proxy_dc_description', 'proxy_dc_creator', 'proxy_dc_publisher', 'proxy_dc_contributor',
-               'proxy_dc_type', 'proxy_dc_identifier', 'proxy_dc_language', 'proxy_dc_coverage',
-               'proxy_dcterms_temporal', 'proxy_dcterms_spatial', 'proxy_dc_subject', 'proxy_dc_date',
-               'proxy_dcterms_created', 'proxy_dcterms_issued', 'proxy_dcterms_extent', 'proxy_dcterms_medium',
-               'proxy_dcterms_provenance', 'proxy_dcterms_hasPart', 'proxy_dcterms_isPartOf', 'proxy_dc_format',
-               'proxy_dc_source', 'proxy_dc_rights', 'proxy_dc_relation', 'proxy_edm_isNextInSequence',
-               'proxy_edm_type', 'aggregation_edm_rights', 'aggregation_edm_provider',
-               'aggregation_edm_dataProvider', 'aggregation_edm_isShownAt', 'aggregation_edm_isShownBy',
-               'aggregation_edm_object', 'aggregation_edm_hasView');
+  'proxy_dc_description', 'proxy_dc_creator', 'proxy_dc_publisher', 'proxy_dc_contributor',
+  'proxy_dc_type', 'proxy_dc_identifier', 'proxy_dc_language', 'proxy_dc_coverage',
+  'proxy_dcterms_temporal', 'proxy_dcterms_spatial', 'proxy_dc_subject', 'proxy_dc_date',
+  'proxy_dcterms_created', 'proxy_dcterms_issued', 'proxy_dcterms_extent', 'proxy_dcterms_medium',
+  'proxy_dcterms_provenance', 'proxy_dcterms_hasPart', 'proxy_dcterms_isPartOf', 'proxy_dc_format',
+  'proxy_dc_source', 'proxy_dc_rights', 'proxy_dc_relation', 'proxy_edm_isNextInSequence',
+  'proxy_edm_type', 'aggregation_edm_rights', 'aggregation_edm_provider',
+  'aggregation_edm_dataProvider', 'aggregation_edm_isShownAt', 'aggregation_edm_isShownBy',
+  'aggregation_edm_object', 'aggregation_edm_hasView'
+);
 has_a_types <- paste(rep('n', length(has_a_fields)), collapse='')
 
 entropy_fields <- c('entropy_dc_title_sum', 'entropy_dc_title_avg',
-               'entropy_dcterms_alternative_sum', 'entropy_dcterms_alternative_avg',
-               'entropy_dc_description_sum', 'entropy_dc_description_avg');
+  'entropy_dcterms_alternative_sum', 'entropy_dcterms_alternative_avg',
+  'entropy_dc_description_sum', 'entropy_dc_description_avg');
 entropy_types <- paste(rep('n', length(entropy_fields)), collapse='')
 
 # all_fields <- c(id_fields, completeness_fields)
