@@ -3,12 +3,16 @@
 $fileName = $argv[1];
 $in = fopen($fileName, "r");
 $out = [];
+$ln = 1;
 while (($line = fgets($in)) != false) {
   if (strpos($line, ',') != false) {
+    if ($ln++ % 100000 == 0) {
+      echo $ln, ' ';
+    }
     $row = str_getcsv($line);
     $files = array(
-      'c' . $row[0],
-      'd' . $row[1]
+      'c' . $row[1],
+      'd' . $row[2]
     );
     foreach ($files as $file) {
       if (!isset($out[$file])) {

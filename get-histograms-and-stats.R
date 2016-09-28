@@ -9,7 +9,10 @@ source("draw.R")
 args <- commandArgs(trailingOnly=TRUE)
 
 path <- getFile(args[1])
-print(paste('path:', path))
+if (!file.exists(path)) {
+  stop(paste('path:', path, "does not exist"))
+}
+print(paste('path:', path, "Start", "@", format(Sys.time(), "%H:%M:%OS3")))
 parts <- unlist(strsplit(path, '/', fixed = TRUE))
 file <- parts[length(parts)]
 id <- getId(file)
@@ -34,6 +37,13 @@ if (is.na(doFrequencies)) {
 }
 print(paste(path, 'doFrequencies:', doFrequencies))
 
+doCardinalities <- as.logical(args[5])
+if (is.na(doCardinalities)) {
+  doCardinalities <- TRUE
+}
+print(paste(path, 'doCardinalities:', doCardinalities))
+print(paste(rep('=', 30), collapse=''))
+
 #id_fields <- c('collection')
 id_fields <- c('provider', 'collection', 'id')
 id_types <- paste(rep('c', length(id_fields)), collapse='')
@@ -57,15 +67,30 @@ has_a_fields <- c('identifier', 'proxy_dc_title', 'proxy_dcterms_alternative',
                'aggregation_edm_object', 'aggregation_edm_hasView');
 has_a_types <- paste(rep('n', length(has_a_fields)), collapse='')
 
+cardinality_fields <- c('crd_identifier', 'crd_proxy_dc_title', 'crd_proxy_dcterms_alternative', 
+               'crd_proxy_dc_description', 'crd_proxy_dc_creator', 'crd_proxy_dc_publisher', 'crd_proxy_dc_contributor',
+               'crd_proxy_dc_type', 'crd_proxy_dc_identifier', 'crd_proxy_dc_language', 'crd_proxy_dc_coverage',
+               'crd_proxy_dcterms_temporal', 'crd_proxy_dcterms_spatial', 'crd_proxy_dc_subject', 'crd_proxy_dc_date',
+               'crd_proxy_dcterms_created', 'crd_proxy_dcterms_issued', 'crd_proxy_dcterms_extent', 'crd_proxy_dcterms_medium',
+               'crd_proxy_dcterms_provenance', 'crd_proxy_dcterms_hasPart', 'crd_proxy_dcterms_isPartOf', 'crd_proxy_dc_format',
+               'crd_proxy_dc_source', 'crd_proxy_dc_rights', 'crd_proxy_dc_relation', 'crd_proxy_edm_isNextInSequence',
+               'crd_proxy_edm_type', 'crd_aggregation_edm_rights', 'crd_aggregation_edm_provider',
+               'crd_aggregation_edm_dataProvider', 'crd_aggregation_edm_isShownAt', 'crd_aggregation_edm_isShownBy',
+               'crd_aggregation_edm_object', 'crd_aggregation_edm_hasView');
+cardinality_types <- paste(rep('n', length(cardinality_fields)), collapse='')
+
+problem_fields <- c('long_subject', 'same_title_and_description', 'empty_string');
+problem_types <- paste(rep('n', length(problem_fields)), collapse='')
+
 entropy_fields <- c('entropy_dc_title_sum', 'entropy_dc_title_avg',
                'entropy_dcterms_alternative_sum', 'entropy_dcterms_alternative_avg',
                'entropy_dc_description_sum', 'entropy_dc_description_avg');
 entropy_types <- paste(rep('n', length(entropy_fields)), collapse='')
 
 # all_fields <- c(id_fields, completeness_fields)
-all_fields <- c(id_fields, completeness_fields, has_a_fields, entropy_fields)
+all_fields <- c(id_fields, completeness_fields, has_a_fields, cardinality_fields, problem_fields, entropy_fields)
 # all_types <- paste(id_types, completeness_types, sep='')
-all_types <- paste(id_types,  completeness_types,  has_a_types,  entropy_types, sep='')
+all_types <- paste(id_types,  completeness_types,  has_a_types, cardinality_types, problem_types, entropy_types, sep='')
 
 qa <- read_csv(path, col_types = all_types, col_names = all_fields);
 
@@ -83,9 +108,9 @@ exportJson <- toJSON(count)
 write(exportJson, paste('json/', id, ".count.json", sep=""))
 rm(count)
 
-print(paste(path, "calculate field frequencies"))
 # STARTS field existency process
 if (doFrequencies) {
+  print(paste(path, "calculate field frequencies"))
   frequencies <- read.table(text = '', colClasses = c("character", "numeric", 'numeric'), col.names = c('field', 'count', 'frequency'))
 
   for (fieldName in has_a_fields) {
@@ -111,8 +136,31 @@ if (doFrequencies) {
 }
 # ENDS field existency process
 
+# STARTS field cardinality process
+if (doCardinalities) {
+  print(paste(path, "calculate field cardinality"))
+  cardinalities <- read.table(text = '', 
+                            colClasses = c("character", "numeric", 'numeric'), 
+                            col.names = c('field', 'count', 'sum', 'mean', 'median'))
+
+  for (fieldName in cardinality_fields) {
+    xs <- qa[,fieldName];
+    fieldCount <- length(xs[xs > 0])
+    fieldSum <- sum(xs)
+    fieldMean <- mean(xs)
+    fieldMedian <- median(xs)
+    cardinalities <- rbind(cardinalities, data.frame(
+      field = substring(fieldName, 5), count = fieldCount, sum = fieldSum, mean = fieldMean, median = fieldMedian))
+  }
+  collector[["cardinalities"]] <- cardinalities
+  exportJson <- toJSON(cardinalities)
+  write(exportJson, paste('json/', id, ".cardinality.json", sep=""))
+  rm(cardinalities)
+}
+# ENDS field cardinality process
+
 print(paste(path, "basic statistics"))
-stat_names <- c(completeness_fields, entropy_fields)
+stat_names <- c(completeness_fields, cardinality_fields, problem_fields, entropy_fields)
 stats <- round(stat.desc(qa[,stat_names], basic=TRUE), digits=4)
 
 stats <- stats[!(rownames(stats) %in% c("nbr.val", "nbr.null", "nbr.na", "sum")),]
@@ -552,5 +600,5 @@ if (drawEntropyGraph == TRUE) {
   saveImage(id, 'entropy_dc_description_avg', bar, box, qq)
 }
 
-print(paste(path, "Finished"))
+print(paste(path, "Finished", "@", format(Sys.time(), "%H:%M:%OS3")))
 rm(list=ls())

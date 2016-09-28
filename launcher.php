@@ -1,17 +1,22 @@
 <?php
-define('MAX_THREADS', 15);
+/**
+ * cp master-setlist.txt setlist.txt
+ */
+
+define('MAX_THREADS', 7);
 define('SET_FILE_NAME', 'setlist.txt');
 
-for ($i = 0; $i<12; $i++) {
-  printf("round %d\n", $i);
-  $threads = exec('ps aux | grep "[=]get-histograms-and-stats.R" | wc -l');
+$endTime = time() + 60;
+$i = 1;
+while (time() < $endTime) {
+  $threads = exec('ps aux | grep "[=]get-histograms-and-stats2.R" | wc -l');
   # echo 'threads: ', $threads, "\n";
   if ($threads < MAX_THREADS) {
     if (filesize(SET_FILE_NAME) > 3) {
       launch_threads($threads);
     }
   }
-  sleep(5);
+  sleep(2);
 }
 
 function launch_threads($running_threads) {
@@ -29,8 +34,8 @@ function launch_threads($running_threads) {
     $contents = join("\n", $lines);
     file_put_contents('setlist.txt', $contents);
     foreach ($sets as $set) {
-      printf("%s launching set: %s\n", date("Y-m-d H:i:s"), $set);
-      exec('nohup Rscript get-histograms-and-stats.R ' . $set . ' F F F >>r-report.txt 2>>r-report.txt &');
+      printf("%s launching set: %s, remaining sets: %d\n", date("Y-m-d H:i:s"), $set, count($lines));
+      exec('nohup Rscript get-histograms-and-stats2.R ' . $set . ' T F T >>r-report.txt 2>>r-report.txt &');
     }
   }
 }
