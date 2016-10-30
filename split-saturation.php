@@ -20,7 +20,7 @@ while (($line = fgets($in)) != false) {
       }
       $out[$file][] = $line;
       if (count($out[$file]) == 500) {
-        file_put_contents('data/' . $file . '.csv', join("", $out[$file]), FILE_APPEND);
+        file_put_contents('saturation/' . $file . '.csv', join("", $out[$file]), FILE_APPEND);
         unset($out[$file]);
       }
     }
@@ -29,5 +29,6 @@ while (($line = fgets($in)) != false) {
 fclose($in);
 
 foreach ($out as $file => $lines) {
-  file_put_contents('data/' . $file . '.csv', join("", $lines), FILE_APPEND);
+  file_put_contents('saturation/' . $file . '.csv', join("", $lines), FILE_APPEND);
 }
+

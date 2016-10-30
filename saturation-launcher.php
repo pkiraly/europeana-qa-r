@@ -1,15 +1,17 @@
 <?php
 /**
- * cp master-setlist.txt setlist.txt
+ * before start:
+ *   ./prepare.sh saturation
  */
 
-define('MAX_THREADS', 6);
+define('MAX_THREADS', 7);
 define('SET_FILE_NAME', 'setlist.txt');
 
+$Rfile = 'saturation.R';
 $endTime = time() + 60;
 $i = 1;
 while (time() < $endTime) {
-  $threads = exec('ps aux | grep "[=]get-histograms-and-stats2.R" | wc -l');
+  $threads = exec('ps aux | grep "[=]' . $Rfile . '" | wc -l');
   # echo 'threads: ', $threads, "\n";
   if ($threads < MAX_THREADS) {
     if (filesize(SET_FILE_NAME) > 3) {
@@ -20,6 +22,8 @@ while (time() < $endTime) {
 }
 
 function launch_threads($running_threads) {
+  global $Rfile;
+
   if (filesize(SET_FILE_NAME) > 3) {
     $contents = file_get_contents(SET_FILE_NAME);
     $lines = explode("\n", $contents);
@@ -35,7 +39,7 @@ function launch_threads($running_threads) {
     file_put_contents('setlist.txt', $contents);
     foreach ($files as $file) {
       printf("%s launching set: %s, remaining sets: %d\n", date("Y-m-d H:i:s"), $file, count($lines));
-      exec('nohup Rscript get-histograms-and-stats2.R --inputFile ' . $file . ' --drawCompletenessGraph F --drawEntropyGraph F --produceJson T >>r-report.log 2>>r-report.log &');
+      exec('nohup Rscript ' . $Rfile . ' --inputFile ' . $file . ' --drawSaturationGraph T --calculateSaturation T --produceJson T >>r-report.log 2>>r-report.log &');
     }
   }
 }

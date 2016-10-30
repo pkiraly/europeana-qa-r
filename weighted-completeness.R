@@ -43,6 +43,10 @@ completeness_labels <- c(
   'All fields', 'Mandatory fields', 'Descriptiveness', 'Searchability', 'Contextualization',
   'Identification', 'Browsing', 'Viewing', 'Reusability', 'Multilinguality'
 )
+completeness_weights <- c(5, 3, 2, 2, 2, 2, 2, 2, 2, 2)
+completeness_weights_total <- sum(completeness_weights)
+print(paste("completeness total: ", completeness_weights_total))
+
 completeness_types <- paste(rep('n', length(completeness_fields)), collapse='')
 
 has_a_fields <- c(
@@ -119,6 +123,34 @@ cardinality_fields <- c(
   'crd_Concept_skos_prefLabel', 'crd_Concept_skos_altLabel', 'crd_Concept_skos_note'
 );
 cardinality_types <- paste(rep('n', length(cardinality_fields)), collapse='')
+cardinality_weights <- rep(1, length(cardinality_fields))
+cardinality_fields_with_weights2 <- c(
+  'crd_Aggregation_rdf_about', 'crd_Place_rdf_about', 'crd_Agent_rdf_about', 'crd_Timespan_rdf_about',
+  'crd_Concept_rdf_about'
+)
+cardinality_weights_stronger <- match(cardinality_fields_with_weights2, cardinality_fields)
+cardinality_weights[cardinality_weights_stronger] <- 10
+cardinality_weights_total <- sum(cardinality_weights)
+
+proxy_fields <- cardinality_fields[grep('crd_Proxy_', cardinality_fields)]
+proxy_weights <- rep(1, length(proxy_fields))
+proxy_weights_total  <- sum(proxy_weights)
+aggregation_fields <- cardinality_fields[grep('crd_Aggregation_', cardinality_fields)]
+aggregation_weights <- rep(1, length(aggregation_fields))
+aggregation_weights_total  <- sum(aggregation_weights)
+place_fields <- cardinality_fields[grep('crd_Place_', cardinality_fields)]
+place_weights <- rep(1, length(place_fields))
+place_weights_total  <- sum(place_weights)
+agent_fields <- cardinality_fields[grep('crd_Agent_', cardinality_fields)]
+agent_weights <- rep(1, length(agent_fields))
+agent_weights_total  <- sum(agent_weights)
+timespan_fields <- cardinality_fields[grep('crd_Timespan_', cardinality_fields)]
+timespan_weights <- rep(1, length(timespan_fields))
+timespan_weights_total  <- sum(timespan_weights)
+concept_fields <- cardinality_fields[grep('crd_Concept_', cardinality_fields)]
+concept_weights <- rep(1, length(concept_fields))
+concept_weights_total  <- sum(concept_weights)
+
 
 problem_fields <- c(
   'long_subject', 'same_title_and_description', 'empty_string'
@@ -153,74 +185,116 @@ sum <- nrow(qa)
 
 print(paste(path, 'total records:', sum))
 
-collector <- list()
+qa[, 'completeness_proxy'] <- apply(
+  qa[, proxy_fields], 1,
+  function(x) {
+    sum(sapply(x, scale_cardinality) * proxy_weights) / proxy_weights_total
+  }
+)
+
+qa[, 'completeness_aggregation'] <- apply(
+  qa[, aggregation_fields], 1,
+  function(x) {
+    sum(sapply(x, scale_cardinality) * aggregation_weights) / aggregation_weights_total
+  }
+)
+
+qa[, 'completeness_agent'] <- apply(
+  qa[, agent_fields], 1,
+  function(x) {
+    sum(sapply(x, scale_cardinality) * agent_weights) / agent_weights_total
+  }
+)
+
+qa[, 'completeness_place'] <- apply(
+  qa[, place_fields], 1,
+  function(x) {
+    sum(sapply(x, scale_cardinality) * place_weights) / place_weights_total
+  }
+)
+
+qa[, 'completeness_timespan'] <- apply(
+  qa[, timespan_fields], 1,
+  function(x) {
+    sum(sapply(x, scale_cardinality) * timespan_weights) / timespan_weights_total
+  }
+)
+
+qa[, 'completeness_concept'] <- apply(
+  qa[, concept_fields], 1,
+  function(x) {
+    sum(sapply(x, scale_cardinality) * concept_weights) / concept_weights_total
+  }
+)
+
+qa[, "weighted_cardinality"] <- apply(
+  qa[, cardinality_fields], 1,
+  function(x) {
+    sum(sapply(x, scale_cardinality) * cardinality_weights) / cardinality_weights_total
+  }
+)
+
+qa[, "weighted_completeness1"] <- apply(
+  qa[, completeness_fields], 1,
+  function(x) {
+    sum(x * completeness_weights) / completeness_weights_total
+  }
+)
+
+weight_of_cardinality <- 0.4
+weighted_completeness2_total <- 1 + weight_of_cardinality
+qa[, 'weighted_completeness2'] <- 
+  ((qa[, 'weighted_completeness1'] + (qa[, 'weighted_cardinality'] * weight_of_cardinality))
+  / weighted_completeness2_total)
+
+summary_fields <- c(
+  'completeness_proxy', 'completeness_aggregation', 'completeness_agent', 'completeness_place',
+  'completeness_timespan', 'completeness_concept',
+  'weighted_cardinality', 'weighted_completeness1', 'weighted_completeness2'
+)
 
 if (opt$produceJson) {
-  count <- c(sum)
-  names(count) <- c('count')
-  count <- data.frame(count)
-  collector[["count"]][['count']] <- sum
-  exportJson <- toJSON(count)
-  write(exportJson, paste(jsonOutputDir, '/', id, ".count.json", sep=""))
-  rm(count)
-}
+  print(paste(path, "summary_fields"))
+  stats <- round(stat.desc(qa[,summary_fields], basic=TRUE), digits=4)
+  names(stats) <- tolower(names(stats))
 
-# STARTS field existency process
-if (opt$produceJson && opt$calculateExistence) {
-  print(paste(path, "calculate field frequencies"))
-  frequencies <- read.table(text = '', colClasses = c("character", "numeric", 'numeric'), col.names = c('field', 'count', 'frequency'))
-
-  for (fieldName in has_a_fields) {
-    countTable <- table(qa[fieldName])
-    countFrame <- data.frame(countTable)
-    countVal <-countFrame[countFrame$Var1 == 1,c('Freq')]
-    if (length(countVal) == 0) {
-      countVal <- 0
-    }
-
-    freqFrame <- data.frame(prop.table(countTable))
-    freqVal <-freqFrame[freqFrame$Var1 == 1,c('Freq')]
-    if (length(freqVal) == 0) {
-      freqVal <- 0
-    }
-
-    frequencies <- rbind(frequencies, data.frame(field = tolower(fieldName), count = countVal, frequency = freqVal)) 
+  stats <- stats[!(rownames(stats) %in% c("nbr.val", "nbr.null", "nbr.na", "sum")),]
+  stats <- data.frame(t(stats))
+  for (name in summary_fields) {
+    stats <- setMinMaxRecId(stats, qa, name)
   }
-  collector[["frequencies"]] <- frequencies
-  exportJson <- toJSON(frequencies)
-  write(exportJson, paste(jsonOutputDir, '/', id, ".freq.json", sep=""))
-  rm(frequencies)
-}
-# ENDS field existency process
 
-# STARTS field cardinality process
-if (opt$produceJson && opt$calculateCardinalities) {
-  print(paste(path, "calculate field cardinality"))
-  cardinalities <- read.table(text = '', 
-                            colClasses = c("character", "numeric", 'numeric'), 
-                            col.names = c('field', 'count', 'sum', 'mean', 'median'))
+  exportJson <- toJSON(stats)
+  jsonFileName <- paste0(jsonOutputDir, '/', id, '.weighted-completeness.json')
+  print(paste(path, "jsonFileName:", jsonFileName))
+  write(exportJson, jsonFileName)
+  rm(stats)
 
-  for (fieldName in cardinality_fields) {
-    xs <- qa[,fieldName];
-    fieldCount <- length(xs[xs > 0])
-    fieldSum <- sum(xs)
-    fieldMean <- mean(xs)
-    fieldMedian <- median(xs)
-    cardinalities <- rbind(cardinalities, data.frame(
-      field = tolower(substring(fieldName, 5)), count = fieldCount, sum = fieldSum, mean = fieldMean, median = fieldMedian))
+  print(paste(path, "histograms"))
+  histograms <- list()
+  for (name in summary_fields) {
+    h <- hist(qa[,c(name)], plot = FALSE, breaks = 8)
+    hist <- read.table(
+      text = '',
+      colClasses = c("character", "numeric", 'numeric'), 
+      col.names = c('label', 'count', 'density'), 
+      stringsAsFactors = FALSE)
+    for (i in 1:length(h$counts)) {
+      label <- paste(h$breaks[i], h$breaks[i + 1], sep = " - ")
+      density <- h$counts[i] * 100 / sum
+      hist[i, ] <- c(label, h$counts[i], density)
+    }
+    histograms[[tolower(name)]] <- hist
   }
-  collector[["cardinalities"]] <- cardinalities
-  exportJson <- toJSON(cardinalities)
-  write(exportJson, paste(jsonOutputDir, '/', id, ".cardinality.json", sep=""))
-  rm(cardinalities)
-}
-# ENDS field cardinality process
+  exportJson <- toJSON(histograms)
+  jsonFileName <- paste0(jsonOutputDir, '/', id, '.weighted-completeness.histogram.json')
+  print(paste(path, "jsonFileName:", jsonFileName))
+  write(exportJson, jsonFileName)
+  rm(histograms)
 
-if (opt$produceJson && opt$calculateFrequencyTables) {
-  print(paste(path, "calculate frequency tables"))
+  print(paste(path, "frequency table"))
   frequencyTable <- list()
-  
-  for (field in all_fields) {
+  for (field in summary_fields) {
     if (field != 'id' && field != 'collection' && field != 'provider') {
       freq <- count(qa, field)
       rows <- list()
@@ -231,103 +305,25 @@ if (opt$produceJson && opt$calculateFrequencyTables) {
       frequencyTable[[field]] <- rows
     }
   }
-
-  collector[["frequencyTable"]] <- frequencyTable
   exportJson <- toJSON(frequencyTable)
-  jsonFileName <- paste0(jsonOutputDir, '/', id, '.frequency.table.json');
+  jsonFileName <- paste0(jsonOutputDir, '/', id, '.weighted-completeness.frequency.table.json');
+  print(paste(path, "jsonFileName:", jsonFileName))
   write(exportJson, jsonFileName)
   rm(frequencyTable)
   rm(jsonFileName)
-} # frequencyTable
-
-if (opt$produceJson) {
-  print(paste(path, "basic statistics"))
-  # stat_names <- c(completeness_fields, cardinality_fields, problem_fields, entropy_fields)
-  stat_names <- c(completeness_fields, cardinality_fields, problem_fields)
-  stats <- round(stat.desc(qa[,stat_names], basic=TRUE), digits=4)
-  names(stats) <- tolower(names(stats))
-  
-  stats <- stats[!(rownames(stats) %in% c("nbr.val", "nbr.null", "nbr.na", "sum")),]
-  stats <- data.frame(t(stats))
-  
-  for (name in stat_names) {
-    stats <- setMinMaxRecId(stats, qa, name)
-  }
-  collector[["stats"]] <- stats
-  exportJson <- toJSON(stats)
-  write(exportJson, paste(jsonOutputDir, '/', id, ".json", sep=""))
-  rm(stats)
-
-  print(paste(path, "histograms"))
-  histograms <- list()
-  for (name in stat_names) {
-    h <- hist(qa[,c(name)], plot = FALSE, breaks = 8)
-    hist <- read.table(text = '', colClasses = c("character", "numeric", 'numeric'), col.names = c('label', 'count', 'density'), 
-                       stringsAsFactors = FALSE)
-    for (i in 1:length(h$counts)) {
-      label <- paste(h$breaks[i], h$breaks[i + 1], sep = " - ")
-      density <- h$counts[i] * 100 / sum
-      hist[i, ] <- c(label, h$counts[i], density)
-    }
-    histograms[[tolower(name)]] <- hist
-  }
-  collector[["histograms"]] <- histograms
-  exportJson <- toJSON(histograms)
-  write(exportJson, paste(jsonOutputDir, '/', id, ".hist.json", sep=""))
-  rm(histograms)
-  
-  exportJson <- toJSON(collector)
-  write(exportJson, paste(jsonOutputDir, '/', id, ".collector.json", sep=""))
-  rm(collector)
-}
-
-if (opt$drawCompletenessGraph == TRUE || opt$drawEntropyGraph == TRUE) {
-  prepareImageDirectory(id)
 }
 
 if (opt$drawCompletenessGraph == TRUE) {
-  prepareImageDirectory(id)
-  for (i in 1:length(completeness_labels)) {
-    print(paste(path, "drawing subdimension", completeness_labels[i]))
-    draw(qa, completeness_fields[i], completeness_labels[i])
-  }
-
-  for (i in 1:length(problem_fields)) {
-    print(paste(path, "drawing problem catalog", problem_labels[i]))
-    draw(qa, problem_fields[i], problem_labels[i])
-  }
-
-  print(paste(path, "drawing cardinalities"))
-  for (fieldName in cardinality_fields) {
-    label <- sub('_', ':',
-                 sub('Aggregation_', 'Aggregation/',
-                     sub('Proxy_', 'Proxy/',
-                         sub('Agent_', 'Agent/',
-                             sub('Place_', 'Place/',
-                                 sub('Timespan_', 'Timespan/',
-                                     sub('Concept_', 'Concept/',
-                                         sub('ProvidedCHO_', 'ProvidedCHO/',
-                                             sub('crd_', '', fieldName)))))))))
-    print(paste(path, "drawing cardinality of", label))
+  print(paste(path, "drawing completeness graphs"))
+  for (fieldName in summary_fields) {
+    label <- fieldName
+    print(paste(path, "drawing ", label))
     draw(qa, fieldName, label)
   }
   warnings()
 }
 
-################################
-# drawing entropy fields
-################################
-
-if (opt$drawEntropyGraph == TRUE) {
-  for (i in 1:length(entropy_fields)) {
-    print(paste(path, "drawing", entropy_labels[i]))
-    draw(qa, entropy_fields[i], entropy_labels[i])
-  }
-  warnings()
-}
-
 warnings()
-# stopQuietly()
 
 duration <- (proc.time() - startTime)
 print(paste(path, "Finished", "@", format(Sys.time(), "%H:%M:%OS3"), 

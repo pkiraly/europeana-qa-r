@@ -54,17 +54,27 @@ saveImage <- function(id, name, hist, box, qq, bar) {
   ifelse(!dir.exists(file.path('img', id)), dir.create(file.path('img', id)), FALSE)
   name <- tolower(name)
 
+  # print(paste(id, "save", "hist", format(Sys.time(), "%H:%M:%OS3")))
+  # ggsave(file = paste('img/', id, '/', id, '-', name, '-hist.png', sep=''), plot=hist, width=15, height=15, units="cm")
+  
+  # print(paste(id, "save", "box", format(Sys.time(), "%H:%M:%OS3")))
+  # ggsave(file = paste('img/', id, '/', id, '-', name, '-box.png', sep=''), plot=box, width=15, height=15, units="cm")
+
+  # print(paste(id, "save", "qq", format(Sys.time(), "%H:%M:%OS3")))
+  # ggsave(file = paste('img/', id, '/', id, '-', name, '-qq.png', sep=''), plot=qq, width=15, height=15, units="cm")
+
+  # print(paste(id, "save", "bar", format(Sys.time(), "%H:%M:%OS3")))
+  # ggsave(file = paste('img/', id, '/', id, '-', name, '-bar.png', sep=''), plot=bar, width=15, height=15, units="cm")
+
   # TODO: overwrite??
-  png(paste('img/', id, '/', id, '-', name, '.png', sep=''), width=1220, height=300, )
+  imgFileName <- paste('img/', id, '/', id, '-', name, '.png', sep='')
+  print(paste("save image", imgFileName))
+  png(imgFileName, width=1220, height=300)
   grid.arrange(bar, hist, box, qq, ncol=4)
+  dev.off()
+  # older settings:
   # grid.arrange(hist, box, qq, ncol=3)
   # grid.arrange(bar, ncol=1)
-  dev.off()
-  
-  # ggsave(file = paste('img/', id, '/', id, '-', name, '-hist.png', sep=''), plot=hist)
-  # ggsave(file = paste('img/', id, '/', id, '-', name, '-box.png', sep=''), plot=box)
-  # ggsave(file = paste('img/', id, '/', id, '-', name, '-qq.png', sep=''), plot=qq)
-  # ggsave(file = paste('img/', id, '/', id, '-', name, '-bar.png', sep=''), plot=bar)
 }
 
 draw <- function(qa, fieldName, label) {
@@ -81,10 +91,10 @@ draw <- function(qa, fieldName, label) {
   freqCount$y <- as.factor(freqCount$y)
   freqDimensions <- dim(freqCount)
 
-  if (freqDimensions[1] == 1) {
-    # print(paste(id, "skip", fieldName))
+  if (freqDimensions[1] == 1) { #} || fieldName == 'crd_Proxy_dcterms_hasPart') {
+    print(paste(id, "skip", fieldName))
   } else {
-    # print(paste(id, "draw", fieldName))
+    print(paste(id, "draw", fieldName))
     
     max <- max(mini$y)
     if (max < 1.0) {
@@ -97,6 +107,7 @@ draw <- function(qa, fieldName, label) {
     } else {
       freq_x_label = 'list of values'
     }
+    # print(paste(id, "draw", fieldName, "barplot", format(Sys.time(), "%H:%M:%OS3")))
     bar <- ggplot(data=freqCount, aes(x=y, y=freq)) +
       theme(legend.position = "none") + 
       geom_bar(stat="identity") +
@@ -104,6 +115,7 @@ draw <- function(qa, fieldName, label) {
       #scale_y_continuous(limits = limits) + 
       scale_fill_brewer(palette="RdBu") + theme_minimal()
 
+    # print(paste(id, "draw", fieldName, "histogram", format(Sys.time(), "%H:%M:%OS3")))
     hist <- ggplot(mini, aes(y)) + 
       theme(legend.position = "none") +
       geom_histogram(aes(y=..density..), colour="black", fill="white", binwidth = 0.01) + #
@@ -119,6 +131,7 @@ draw <- function(qa, fieldName, label) {
       scale_x_continuous(limits = limits) + 
       scale_fill_brewer(palette="RdBu") + theme_minimal()
     
+    # print(paste(id, "draw", fieldName, "boxplot", format(Sys.time(), "%H:%M:%OS3")))
     box <- ggplot(mini, aes(x=mini$x, y=mini$y)) +
       geom_boxplot() + 
       labs(title="Boxplot", x="Collection", y=label) +
@@ -127,13 +140,32 @@ draw <- function(qa, fieldName, label) {
       scale_y_continuous(limits=c(0, max)) +
       theme_minimal()
     
+    # print(paste(id, "draw", fieldName, "qq plot", format(Sys.time(), "%H:%M:%OS3")))
     qq <- qplot(sample = mini$y) + stat_qq() +
       labs(title="Quantile plot", y=label) +
       scale_fill_brewer(palette="RdBu") + theme_minimal() +
       scale_y_continuous(limits=c(0, max))
     
     saveImage(id, fieldName, hist, box, qq, bar)
+    rm(hist, box, qq, bar)
+    rm(max, limits, freq_x_label)
   }
+  rm(mini, freqCount, freqDimensions)
+}
+
+scale_cardinality <- function(cardinality) {
+  if (cardinality < 1) {
+    scaled <- 0
+  } else if (cardinality == 1) {
+    scaled <- 1
+  } else if (cardinality > 1 && cardinality <= 4) {
+    scaled <- 2
+  } else if (cardinality > 4 && cardinality <= 10) {
+    scaled <- 3
+  } else {
+    scaled <- 4
+  }
+  scaled / 4.0
 }
 
 stopQuietly <- function(...) {
