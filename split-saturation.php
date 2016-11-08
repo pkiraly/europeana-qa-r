@@ -32,3 +32,4 @@ foreach ($out as $file => $lines) {
   file_put_contents('saturation/' . $file . '.csv', join("", $lines), FILE_APPEND);
 }
 
+echo 'DONE', "\n";

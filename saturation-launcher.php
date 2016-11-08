@@ -2,12 +2,19 @@
 /**
  * before start:
  *   ./prepare.sh saturation
+ *
+ * launch:
+ *   crontab -e
+ *   *\/ 1 * * * * cd ~/git/europeana-qa-r && php saturation-launcher.php >> launch-report.log
+ *
+ * monitoring:
+ *   watch './running-status.sh saturation'
  */
 
 define('MAX_THREADS', 7);
 define('SET_FILE_NAME', 'setlist.txt');
 
-$Rfile = 'saturation.R';
+$Rfile = 'saturation-extended.R';
 $endTime = time() + 60;
 $i = 1;
 while (time() < $endTime) {

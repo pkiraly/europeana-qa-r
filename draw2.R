@@ -92,9 +92,9 @@ draw <- function(qa, fieldName, label) {
   freqDimensions <- dim(freqCount)
 
   if (freqDimensions[1] == 1) { #} || fieldName == 'crd_Proxy_dcterms_hasPart') {
-    print(paste(id, "skip", fieldName))
+    # print(paste(id, "skip", fieldName))
   } else {
-    print(paste(id, "draw", fieldName))
+    # print(paste(id, "draw", fieldName))
     
     max <- max(mini$y)
     if (max < 1.0) {

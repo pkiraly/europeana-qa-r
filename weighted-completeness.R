@@ -135,18 +135,23 @@ cardinality_weights_total <- sum(cardinality_weights)
 proxy_fields <- cardinality_fields[grep('crd_Proxy_', cardinality_fields)]
 proxy_weights <- rep(1, length(proxy_fields))
 proxy_weights_total  <- sum(proxy_weights)
+
 aggregation_fields <- cardinality_fields[grep('crd_Aggregation_', cardinality_fields)]
 aggregation_weights <- rep(1, length(aggregation_fields))
 aggregation_weights_total  <- sum(aggregation_weights)
+
 place_fields <- cardinality_fields[grep('crd_Place_', cardinality_fields)]
 place_weights <- rep(1, length(place_fields))
 place_weights_total  <- sum(place_weights)
+
 agent_fields <- cardinality_fields[grep('crd_Agent_', cardinality_fields)]
 agent_weights <- rep(1, length(agent_fields))
 agent_weights_total  <- sum(agent_weights)
+
 timespan_fields <- cardinality_fields[grep('crd_Timespan_', cardinality_fields)]
 timespan_weights <- rep(1, length(timespan_fields))
 timespan_weights_total  <- sum(timespan_weights)
+
 concept_fields <- cardinality_fields[grep('crd_Concept_', cardinality_fields)]
 concept_weights <- rep(1, length(concept_fields))
 concept_weights_total  <- sum(concept_weights)
