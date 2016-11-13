@@ -13,6 +13,7 @@
 
 define('MAX_THREADS', 7);
 define('SET_FILE_NAME', 'setlist.txt');
+define('R_OPTIONS', ' --drawSaturationGraph F --drawTopSaturationGraph T --calculateSaturation T --produceJson T');
 
 $Rfile = 'saturation-extended.R';
 $endTime = time() + 60;
@@ -46,7 +47,7 @@ function launch_threads($running_threads) {
     file_put_contents('setlist.txt', $contents);
     foreach ($files as $file) {
       printf("%s launching set: %s, remaining sets: %d\n", date("Y-m-d H:i:s"), $file, count($lines));
-      exec('nohup Rscript ' . $Rfile . ' --inputFile ' . $file . ' --drawSaturationGraph T --calculateSaturation T --produceJson T >>r-report.log 2>>r-report.log &');
+      exec('nohup Rscript ' . $Rfile . ' --inputFile ' . $file . R_OPTIONS . ' >>r-report.log 2>>r-report.log &');
     }
   }
 }

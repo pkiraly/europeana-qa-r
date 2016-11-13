@@ -93,6 +93,15 @@ saturation_fields <- gsub('/', '_', saturation_fields)
 # saturation_fields <- paste0('saturation_', saturation_fields)
 saturation_types <- paste(rep('n', length(saturation_fields)), collapse='')
 
+saturation_sum <- saturation_fields[grep('saturation_sum_', saturation_fields)]
+saturation_average <- saturation_fields[grep('saturation_average_', saturation_fields)]
+saturation_normalized <- saturation_fields[grep('saturation_normalized_', saturation_fields)]
+len_sum <- length(saturation_average)
+len_avg <- length(saturation_average)
+len_nrm <- length(saturation_normalized)
+saturation_average
+saturation_normalized
+
 all_fields <- c(id_fields, saturation_fields)
 all_types <- paste(id_types, saturation_types, sep='')
 
@@ -102,9 +111,14 @@ sum <- nrow(qa)
 
 print(paste(path, 'total records:', sum))
 
+qa[, 'saturation_sum'] <- apply(qa[, saturation_sum], 1, function(x) {sum(x)})
+qa[, 'saturation_average'] <- apply(qa[, saturation_average], 1, function(x) {sum(x) / len_avg})
+qa[, 'saturation_normalized'] <- apply(qa[, saturation_average], 1, function(x) {sum(x) / len_nrm})
+top_fields <- c('saturation_sum', 'saturation_average', 'saturation_normalized')
+
 if (opt$produceJson) {
   print(paste(path, "basic statistics"))
-  stat_names <- c(saturation_fields)
+  stat_names <- c(saturation_fields, top_fields)
   stats <- round(stat.desc(qa[,stat_names], basic=TRUE), digits=4)
   names(stats) <- tolower(names(stats))
   
@@ -175,6 +189,17 @@ if (opt$drawSaturationGraph == TRUE) {
                                  sub('Timespan_', 'Timespan/',
                                      sub('Concept_', 'Concept/',
                                          sub('saturation_', '', fieldName))))))))
+    # print(paste(path, "drawing saturation of", label))
+    draw(qa, fieldName, label)
+  }
+  top_fields
+  warnings()
+}
+
+if (opt$drawTopSaturationGraph == TRUE) {
+  print(paste(path, "drawing top saturation"))
+  for (fieldName in top_fields) {
+    label <- fieldName
     # print(paste(path, "drawing saturation of", label))
     draw(qa, fieldName, label)
   }

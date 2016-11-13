@@ -14,6 +14,10 @@ option_list = list(
     help="draw saturation graph"
   ),
   make_option(
+    c("-t", "--drawTopSaturationGraph"), type="logical", default=TRUE, metavar="logical",
+    help="draw saturation graph"
+  ),
+  make_option(
     c("-j", "--produceJson"), type="logical", default=TRUE, metavar="logical",
     help="produce JSON files"
   )
