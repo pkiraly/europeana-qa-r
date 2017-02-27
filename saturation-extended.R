@@ -1,7 +1,7 @@
 library(readr)
 library(pastecs)
 library(ggplot2)
-library(grid)
+library(grid) # stat.desc
 library(gridExtra)
 library(jsonlite)
 library(plyr)
@@ -84,7 +84,116 @@ saturation_fields <- c(
   'saturation:normalized:Proxy/dcterms:hasVersion', 'saturation:sum:Proxy/dcterms:isFormatOf',
   'saturation:average:Proxy/dcterms:isFormatOf', 'saturation:normalized:Proxy/dcterms:isFormatOf',
   'saturation:sum:Proxy/dcterms:isReferencedBy', 'saturation:average:Proxy/dcterms:isReferencedBy',
-  'saturation:normalized:Proxy/dcterms:isReferencedBy', 'saturation:sum:Proxy/dcterms:isReplacedBy', 'saturation:average:Proxy/dcterms:isReplacedBy', 'saturation:normalized:Proxy/dcterms:isReplacedBy', 'saturation:sum:Proxy/dcterms:isRequiredBy', 'saturation:average:Proxy/dcterms:isRequiredBy', 'saturation:normalized:Proxy/dcterms:isRequiredBy', 'saturation:sum:Proxy/dcterms:isVersionOf', 'saturation:average:Proxy/dcterms:isVersionOf', 'saturation:normalized:Proxy/dcterms:isVersionOf', 'saturation:sum:Proxy/dcterms:references', 'saturation:average:Proxy/dcterms:references', 'saturation:normalized:Proxy/dcterms:references', 'saturation:sum:Proxy/dcterms:replaces', 'saturation:average:Proxy/dcterms:replaces', 'saturation:normalized:Proxy/dcterms:replaces', 'saturation:sum:Proxy/dcterms:requires', 'saturation:average:Proxy/dcterms:requires', 'saturation:normalized:Proxy/dcterms:requires', 'saturation:sum:Proxy/dcterms:tableOfContents', 'saturation:average:Proxy/dcterms:tableOfContents', 'saturation:normalized:Proxy/dcterms:tableOfContents', 'saturation:sum:Proxy/edm:currentLocation', 'saturation:average:Proxy/edm:currentLocation', 'saturation:normalized:Proxy/edm:currentLocation', 'saturation:sum:Proxy/edm:hasMet', 'saturation:average:Proxy/edm:hasMet', 'saturation:normalized:Proxy/edm:hasMet', 'saturation:sum:Proxy/edm:hasType', 'saturation:average:Proxy/edm:hasType', 'saturation:normalized:Proxy/edm:hasType', 'saturation:sum:Proxy/edm:incorporates', 'saturation:average:Proxy/edm:incorporates', 'saturation:normalized:Proxy/edm:incorporates', 'saturation:sum:Proxy/edm:isDerivativeOf', 'saturation:average:Proxy/edm:isDerivativeOf', 'saturation:normalized:Proxy/edm:isDerivativeOf', 'saturation:sum:Proxy/edm:isRelatedTo', 'saturation:average:Proxy/edm:isRelatedTo', 'saturation:normalized:Proxy/edm:isRelatedTo', 'saturation:sum:Proxy/edm:isRepresentationOf', 'saturation:average:Proxy/edm:isRepresentationOf', 'saturation:normalized:Proxy/edm:isRepresentationOf', 'saturation:sum:Proxy/edm:isSimilarTo', 'saturation:average:Proxy/edm:isSimilarTo', 'saturation:normalized:Proxy/edm:isSimilarTo', 'saturation:sum:Proxy/edm:isSuccessorOf', 'saturation:average:Proxy/edm:isSuccessorOf', 'saturation:normalized:Proxy/edm:isSuccessorOf', 'saturation:sum:Proxy/edm:realizes', 'saturation:average:Proxy/edm:realizes', 'saturation:normalized:Proxy/edm:realizes', 'saturation:sum:Proxy/edm:wasPresentAt', 'saturation:average:Proxy/edm:wasPresentAt', 'saturation:normalized:Proxy/edm:wasPresentAt', 'saturation:sum:Aggregation/edm:rights', 'saturation:average:Aggregation/edm:rights', 'saturation:normalized:Aggregation/edm:rights', 'saturation:sum:Aggregation/edm:provider', 'saturation:average:Aggregation/edm:provider', 'saturation:normalized:Aggregation/edm:provider', 'saturation:sum:Aggregation/edm:dataProvider', 'saturation:average:Aggregation/edm:dataProvider', 'saturation:normalized:Aggregation/edm:dataProvider', 'saturation:sum:Aggregation/dc:rights', 'saturation:average:Aggregation/dc:rights', 'saturation:normalized:Aggregation/dc:rights', 'saturation:sum:Aggregation/edm:ugc', 'saturation:average:Aggregation/edm:ugc', 'saturation:normalized:Aggregation/edm:ugc', 'saturation:sum:Aggregation/edm:aggregatedCHO', 'saturation:average:Aggregation/edm:aggregatedCHO', 'saturation:normalized:Aggregation/edm:aggregatedCHO', 'saturation:sum:Aggregation/edm:intermediateProvider', 'saturation:average:Aggregation/edm:intermediateProvider', 'saturation:normalized:Aggregation/edm:intermediateProvider', 'saturation:sum:Place/dcterms:isPartOf', 'saturation:average:Place/dcterms:isPartOf', 'saturation:normalized:Place/dcterms:isPartOf', 'saturation:sum:Place/dcterms:hasPart', 'saturation:average:Place/dcterms:hasPart', 'saturation:normalized:Place/dcterms:hasPart', 'saturation:sum:Place/skos:prefLabel', 'saturation:average:Place/skos:prefLabel', 'saturation:normalized:Place/skos:prefLabel', 'saturation:sum:Place/skos:altLabel', 'saturation:average:Place/skos:altLabel', 'saturation:normalized:Place/skos:altLabel', 'saturation:sum:Place/skos:note', 'saturation:average:Place/skos:note', 'saturation:normalized:Place/skos:note', 'saturation:sum:Agent/edm:begin', 'saturation:average:Agent/edm:begin', 'saturation:normalized:Agent/edm:begin', 'saturation:sum:Agent/edm:end', 'saturation:average:Agent/edm:end', 'saturation:normalized:Agent/edm:end', 'saturation:sum:Agent/edm:hasMet', 'saturation:average:Agent/edm:hasMet', 'saturation:normalized:Agent/edm:hasMet', 'saturation:sum:Agent/edm:isRelatedTo', 'saturation:average:Agent/edm:isRelatedTo', 'saturation:normalized:Agent/edm:isRelatedTo', 'saturation:sum:Agent/owl:sameAs', 'saturation:average:Agent/owl:sameAs', 'saturation:normalized:Agent/owl:sameAs', 'saturation:sum:Agent/foaf:name', 'saturation:average:Agent/foaf:name', 'saturation:normalized:Agent/foaf:name', 'saturation:sum:Agent/dc:date', 'saturation:average:Agent/dc:date', 'saturation:normalized:Agent/dc:date', 'saturation:sum:Agent/dc:identifier', 'saturation:average:Agent/dc:identifier', 'saturation:normalized:Agent/dc:identifier', 'saturation:sum:Agent/rdaGr2:dateOfBirth', 'saturation:average:Agent/rdaGr2:dateOfBirth', 'saturation:normalized:Agent/rdaGr2:dateOfBirth', 'saturation:sum:Agent/rdaGr2:placeOfBirth', 'saturation:average:Agent/rdaGr2:placeOfBirth', 'saturation:normalized:Agent/rdaGr2:placeOfBirth', 'saturation:sum:Agent/rdaGr2:dateOfDeath', 'saturation:average:Agent/rdaGr2:dateOfDeath', 'saturation:normalized:Agent/rdaGr2:dateOfDeath', 'saturation:sum:Agent/rdaGr2:placeOfDeath', 'saturation:average:Agent/rdaGr2:placeOfDeath', 'saturation:normalized:Agent/rdaGr2:placeOfDeath', 'saturation:sum:Agent/rdaGr2:dateOfEstablishment', 'saturation:average:Agent/rdaGr2:dateOfEstablishment', 'saturation:normalized:Agent/rdaGr2:dateOfEstablishment', 'saturation:sum:Agent/rdaGr2:dateOfTermination', 'saturation:average:Agent/rdaGr2:dateOfTermination', 'saturation:normalized:Agent/rdaGr2:dateOfTermination', 'saturation:sum:Agent/rdaGr2:gender', 'saturation:average:Agent/rdaGr2:gender', 'saturation:normalized:Agent/rdaGr2:gender', 'saturation:sum:Agent/rdaGr2:professionOrOccupation', 'saturation:average:Agent/rdaGr2:professionOrOccupation', 'saturation:normalized:Agent/rdaGr2:professionOrOccupation', 'saturation:sum:Agent/rdaGr2:biographicalInformation', 'saturation:average:Agent/rdaGr2:biographicalInformation', 'saturation:normalized:Agent/rdaGr2:biographicalInformation', 'saturation:sum:Agent/skos:prefLabel', 'saturation:average:Agent/skos:prefLabel', 'saturation:normalized:Agent/skos:prefLabel', 'saturation:sum:Agent/skos:altLabel', 'saturation:average:Agent/skos:altLabel', 'saturation:normalized:Agent/skos:altLabel', 'saturation:sum:Agent/skos:note', 'saturation:average:Agent/skos:note', 'saturation:normalized:Agent/skos:note', 'saturation:sum:Timespan/edm:begin', 'saturation:average:Timespan/edm:begin', 'saturation:normalized:Timespan/edm:begin', 'saturation:sum:Timespan/edm:end', 'saturation:average:Timespan/edm:end', 'saturation:normalized:Timespan/edm:end', 'saturation:sum:Timespan/dcterms:isPartOf', 'saturation:average:Timespan/dcterms:isPartOf', 'saturation:normalized:Timespan/dcterms:isPartOf', 'saturation:sum:Timespan/dcterms:hasPart', 'saturation:average:Timespan/dcterms:hasPart', 'saturation:normalized:Timespan/dcterms:hasPart', 'saturation:sum:Timespan/edm:isNextInSequence', 'saturation:average:Timespan/edm:isNextInSequence', 'saturation:normalized:Timespan/edm:isNextInSequence', 'saturation:sum:Timespan/owl:sameAs', 'saturation:average:Timespan/owl:sameAs', 'saturation:normalized:Timespan/owl:sameAs', 'saturation:sum:Timespan/skos:prefLabel', 'saturation:average:Timespan/skos:prefLabel', 'saturation:normalized:Timespan/skos:prefLabel', 'saturation:sum:Timespan/skos:altLabel', 'saturation:average:Timespan/skos:altLabel', 'saturation:normalized:Timespan/skos:altLabel', 'saturation:sum:Timespan/skos:note', 'saturation:average:Timespan/skos:note', 'saturation:normalized:Timespan/skos:note', 'saturation:sum:Concept/skos:broader', 'saturation:average:Concept/skos:broader', 'saturation:normalized:Concept/skos:broader', 'saturation:sum:Concept/skos:narrower', 'saturation:average:Concept/skos:narrower', 'saturation:normalized:Concept/skos:narrower', 'saturation:sum:Concept/skos:related', 'saturation:average:Concept/skos:related', 'saturation:normalized:Concept/skos:related', 'saturation:sum:Concept/skos:broadMatch', 'saturation:average:Concept/skos:broadMatch', 'saturation:normalized:Concept/skos:broadMatch', 'saturation:sum:Concept/skos:narrowMatch', 'saturation:average:Concept/skos:narrowMatch', 'saturation:normalized:Concept/skos:narrowMatch', 'saturation:sum:Concept/skos:relatedMatch', 'saturation:average:Concept/skos:relatedMatch', 'saturation:normalized:Concept/skos:relatedMatch', 'saturation:sum:Concept/skos:exactMatch', 'saturation:average:Concept/skos:exactMatch', 'saturation:normalized:Concept/skos:exactMatch', 'saturation:sum:Concept/skos:closeMatch', 'saturation:average:Concept/skos:closeMatch', 'saturation:normalized:Concept/skos:closeMatch', 'saturation:sum:Concept/skos:notation', 'saturation:average:Concept/skos:notation', 'saturation:normalized:Concept/skos:notation', 'saturation:sum:Concept/skos:inScheme', 'saturation:average:Concept/skos:inScheme', 'saturation:normalized:Concept/skos:inScheme', 'saturation:sum:Concept/skos:prefLabel', 'saturation:average:Concept/skos:prefLabel', 'saturation:normalized:Concept/skos:prefLabel', 'saturation:sum:Concept/skos:altLabel', 'saturation:average:Concept/skos:altLabel', 'saturation:normalized:Concept/skos:altLabel', 'saturation:sum:Concept/skos:note', 'saturation:average:Concept/skos:note', 'saturation:normalized:Concept/skos:note'
+  'saturation:normalized:Proxy/dcterms:isReferencedBy', 'saturation:sum:Proxy/dcterms:isReplacedBy',
+  'saturation:average:Proxy/dcterms:isReplacedBy', 'saturation:normalized:Proxy/dcterms:isReplacedBy',
+  'saturation:sum:Proxy/dcterms:isRequiredBy', 'saturation:average:Proxy/dcterms:isRequiredBy',
+  'saturation:normalized:Proxy/dcterms:isRequiredBy', 'saturation:sum:Proxy/dcterms:isVersionOf',
+  'saturation:average:Proxy/dcterms:isVersionOf', 'saturation:normalized:Proxy/dcterms:isVersionOf',
+  'saturation:sum:Proxy/dcterms:references', 'saturation:average:Proxy/dcterms:references',
+  'saturation:normalized:Proxy/dcterms:references', 'saturation:sum:Proxy/dcterms:replaces',
+  'saturation:average:Proxy/dcterms:replaces', 'saturation:normalized:Proxy/dcterms:replaces',
+  'saturation:sum:Proxy/dcterms:requires', 'saturation:average:Proxy/dcterms:requires',
+  'saturation:normalized:Proxy/dcterms:requires', 'saturation:sum:Proxy/dcterms:tableOfContents',
+  'saturation:average:Proxy/dcterms:tableOfContents', 'saturation:normalized:Proxy/dcterms:tableOfContents',
+  'saturation:sum:Proxy/edm:currentLocation', 'saturation:average:Proxy/edm:currentLocation',
+  'saturation:normalized:Proxy/edm:currentLocation', 'saturation:sum:Proxy/edm:hasMet',
+  'saturation:average:Proxy/edm:hasMet', 'saturation:normalized:Proxy/edm:hasMet',
+  'saturation:sum:Proxy/edm:hasType', 'saturation:average:Proxy/edm:hasType',
+  'saturation:normalized:Proxy/edm:hasType', 'saturation:sum:Proxy/edm:incorporates',
+  'saturation:average:Proxy/edm:incorporates', 'saturation:normalized:Proxy/edm:incorporates',
+  'saturation:sum:Proxy/edm:isDerivativeOf', 'saturation:average:Proxy/edm:isDerivativeOf',
+  'saturation:normalized:Proxy/edm:isDerivativeOf', 'saturation:sum:Proxy/edm:isRelatedTo',
+  'saturation:average:Proxy/edm:isRelatedTo', 'saturation:normalized:Proxy/edm:isRelatedTo',
+  'saturation:sum:Proxy/edm:isRepresentationOf', 'saturation:average:Proxy/edm:isRepresentationOf',
+  'saturation:normalized:Proxy/edm:isRepresentationOf', 'saturation:sum:Proxy/edm:isSimilarTo',
+  'saturation:average:Proxy/edm:isSimilarTo', 'saturation:normalized:Proxy/edm:isSimilarTo',
+  'saturation:sum:Proxy/edm:isSuccessorOf', 'saturation:average:Proxy/edm:isSuccessorOf',
+  'saturation:normalized:Proxy/edm:isSuccessorOf', 'saturation:sum:Proxy/edm:realizes',
+  'saturation:average:Proxy/edm:realizes', 'saturation:normalized:Proxy/edm:realizes',
+  'saturation:sum:Proxy/edm:wasPresentAt', 'saturation:average:Proxy/edm:wasPresentAt',
+  'saturation:normalized:Proxy/edm:wasPresentAt', 'saturation:sum:Aggregation/edm:rights',
+  'saturation:average:Aggregation/edm:rights', 'saturation:normalized:Aggregation/edm:rights',
+  'saturation:sum:Aggregation/edm:provider', 'saturation:average:Aggregation/edm:provider',
+  'saturation:normalized:Aggregation/edm:provider', 'saturation:sum:Aggregation/edm:dataProvider',
+  'saturation:average:Aggregation/edm:dataProvider', 'saturation:normalized:Aggregation/edm:dataProvider',
+  'saturation:sum:Aggregation/dc:rights', 'saturation:average:Aggregation/dc:rights',
+  'saturation:normalized:Aggregation/dc:rights', 'saturation:sum:Aggregation/edm:ugc',
+  'saturation:average:Aggregation/edm:ugc',
+  'saturation:normalized:Aggregation/edm:ugc', 'saturation:sum:Aggregation/edm:aggregatedCHO',
+  'saturation:average:Aggregation/edm:aggregatedCHO', 'saturation:normalized:Aggregation/edm:aggregatedCHO',
+  'saturation:sum:Aggregation/edm:intermediateProvider', 'saturation:average:Aggregation/edm:intermediateProvider',
+  'saturation:normalized:Aggregation/edm:intermediateProvider', 'saturation:sum:Place/dcterms:isPartOf',
+  'saturation:average:Place/dcterms:isPartOf', 'saturation:normalized:Place/dcterms:isPartOf',
+  'saturation:sum:Place/dcterms:hasPart', 'saturation:average:Place/dcterms:hasPart',
+  'saturation:normalized:Place/dcterms:hasPart', 'saturation:sum:Place/skos:prefLabel',
+  'saturation:average:Place/skos:prefLabel', 'saturation:normalized:Place/skos:prefLabel',
+  'saturation:sum:Place/skos:altLabel', 'saturation:average:Place/skos:altLabel',
+  'saturation:normalized:Place/skos:altLabel', 'saturation:sum:Place/skos:note',
+  'saturation:average:Place/skos:note', 'saturation:normalized:Place/skos:note',
+  'saturation:sum:Agent/edm:begin', 'saturation:average:Agent/edm:begin',
+  'saturation:normalized:Agent/edm:begin', 'saturation:sum:Agent/edm:end',
+  'saturation:average:Agent/edm:end', 'saturation:normalized:Agent/edm:end', 'saturation:sum:Agent/edm:hasMet',
+  'saturation:average:Agent/edm:hasMet', 'saturation:normalized:Agent/edm:hasMet',
+  'saturation:sum:Agent/edm:isRelatedTo', 'saturation:average:Agent/edm:isRelatedTo',
+  'saturation:normalized:Agent/edm:isRelatedTo', 'saturation:sum:Agent/owl:sameAs',
+  'saturation:average:Agent/owl:sameAs', 'saturation:normalized:Agent/owl:sameAs',
+  'saturation:sum:Agent/foaf:name', 'saturation:average:Agent/foaf:name',
+  'saturation:normalized:Agent/foaf:name', 'saturation:sum:Agent/dc:date', 'saturation:average:Agent/dc:date',
+  'saturation:normalized:Agent/dc:date', 'saturation:sum:Agent/dc:identifier',
+  'saturation:average:Agent/dc:identifier', 'saturation:normalized:Agent/dc:identifier',
+  'saturation:sum:Agent/rdaGr2:dateOfBirth', 'saturation:average:Agent/rdaGr2:dateOfBirth',
+  'saturation:normalized:Agent/rdaGr2:dateOfBirth', 'saturation:sum:Agent/rdaGr2:placeOfBirth',
+  'saturation:average:Agent/rdaGr2:placeOfBirth', 'saturation:normalized:Agent/rdaGr2:placeOfBirth',
+  'saturation:sum:Agent/rdaGr2:dateOfDeath', 'saturation:average:Agent/rdaGr2:dateOfDeath',
+  'saturation:normalized:Agent/rdaGr2:dateOfDeath', 'saturation:sum:Agent/rdaGr2:placeOfDeath',
+  'saturation:average:Agent/rdaGr2:placeOfDeath', 'saturation:normalized:Agent/rdaGr2:placeOfDeath',
+  'saturation:sum:Agent/rdaGr2:dateOfEstablishment', 'saturation:average:Agent/rdaGr2:dateOfEstablishment',
+  'saturation:normalized:Agent/rdaGr2:dateOfEstablishment', 'saturation:sum:Agent/rdaGr2:dateOfTermination',
+  'saturation:average:Agent/rdaGr2:dateOfTermination', 'saturation:normalized:Agent/rdaGr2:dateOfTermination',
+  'saturation:sum:Agent/rdaGr2:gender', 'saturation:average:Agent/rdaGr2:gender',
+  'saturation:normalized:Agent/rdaGr2:gender', 'saturation:sum:Agent/rdaGr2:professionOrOccupation',
+  'saturation:average:Agent/rdaGr2:professionOrOccupation', 'saturation:normalized:Agent/rdaGr2:professionOrOccupation',
+  'saturation:sum:Agent/rdaGr2:biographicalInformation', 'saturation:average:Agent/rdaGr2:biographicalInformation',
+  'saturation:normalized:Agent/rdaGr2:biographicalInformation', 'saturation:sum:Agent/skos:prefLabel',
+  'saturation:average:Agent/skos:prefLabel', 'saturation:normalized:Agent/skos:prefLabel',
+  'saturation:sum:Agent/skos:altLabel', 'saturation:average:Agent/skos:altLabel',
+  'saturation:normalized:Agent/skos:altLabel', 'saturation:sum:Agent/skos:note',
+  'saturation:average:Agent/skos:note', 'saturation:normalized:Agent/skos:note',
+  'saturation:sum:Timespan/edm:begin', 'saturation:average:Timespan/edm:begin',
+  'saturation:normalized:Timespan/edm:begin', 'saturation:sum:Timespan/edm:end',
+  'saturation:average:Timespan/edm:end', 'saturation:normalized:Timespan/edm:end',
+  'saturation:sum:Timespan/dcterms:isPartOf', 'saturation:average:Timespan/dcterms:isPartOf',
+  'saturation:normalized:Timespan/dcterms:isPartOf', 'saturation:sum:Timespan/dcterms:hasPart',
+  'saturation:average:Timespan/dcterms:hasPart', 'saturation:normalized:Timespan/dcterms:hasPart',
+  'saturation:sum:Timespan/edm:isNextInSequence', 'saturation:average:Timespan/edm:isNextInSequence',
+  'saturation:normalized:Timespan/edm:isNextInSequence', 'saturation:sum:Timespan/owl:sameAs',
+  'saturation:average:Timespan/owl:sameAs', 'saturation:normalized:Timespan/owl:sameAs',
+  'saturation:sum:Timespan/skos:prefLabel', 'saturation:average:Timespan/skos:prefLabel',
+  'saturation:normalized:Timespan/skos:prefLabel', 'saturation:sum:Timespan/skos:altLabel',
+  'saturation:average:Timespan/skos:altLabel', 'saturation:normalized:Timespan/skos:altLabel',
+  'saturation:sum:Timespan/skos:note', 'saturation:average:Timespan/skos:note',
+  'saturation:normalized:Timespan/skos:note', 'saturation:sum:Concept/skos:broader',
+  'saturation:average:Concept/skos:broader', 'saturation:normalized:Concept/skos:broader',
+  'saturation:sum:Concept/skos:narrower', 'saturation:average:Concept/skos:narrower',
+  'saturation:normalized:Concept/skos:narrower', 'saturation:sum:Concept/skos:related',
+  'saturation:average:Concept/skos:related', 'saturation:normalized:Concept/skos:related',
+  'saturation:sum:Concept/skos:broadMatch', 'saturation:average:Concept/skos:broadMatch',
+  'saturation:normalized:Concept/skos:broadMatch', 'saturation:sum:Concept/skos:narrowMatch',
+  'saturation:average:Concept/skos:narrowMatch', 'saturation:normalized:Concept/skos:narrowMatch',
+  'saturation:sum:Concept/skos:relatedMatch', 'saturation:average:Concept/skos:relatedMatch',
+  'saturation:normalized:Concept/skos:relatedMatch', 'saturation:sum:Concept/skos:exactMatch',
+  'saturation:average:Concept/skos:exactMatch',
+  'saturation:normalized:Concept/skos:exactMatch', 'saturation:sum:Concept/skos:closeMatch',
+  'saturation:average:Concept/skos:closeMatch', 'saturation:normalized:Concept/skos:closeMatch',
+  'saturation:sum:Concept/skos:notation', 'saturation:average:Concept/skos:notation',
+  'saturation:normalized:Concept/skos:notation', 'saturation:sum:Concept/skos:inScheme',
+  'saturation:average:Concept/skos:inScheme', 'saturation:normalized:Concept/skos:inScheme',
+  'saturation:sum:Concept/skos:prefLabel', 'saturation:average:Concept/skos:prefLabel',
+  'saturation:normalized:Concept/skos:prefLabel',
+  'saturation:sum:Concept/skos:altLabel', 'saturation:average:Concept/skos:altLabel',
+  'saturation:normalized:Concept/skos:altLabel', 'saturation:sum:Concept/skos:note',
+  'saturation:average:Concept/skos:note', 'saturation:normalized:Concept/skos:note',
+  'saturation_sum', 'saturation_average', 'saturation_normalized'
 );
 # add 'saturation_' prefix
 saturation_fields <- gsub(':', '_', saturation_fields)
@@ -92,15 +201,6 @@ saturation_fields <- gsub('/', '_', saturation_fields)
 # print(saturation_fields)
 # saturation_fields <- paste0('saturation_', saturation_fields)
 saturation_types <- paste(rep('n', length(saturation_fields)), collapse='')
-
-saturation_sum <- saturation_fields[grep('saturation_sum_', saturation_fields)]
-saturation_average <- saturation_fields[grep('saturation_average_', saturation_fields)]
-saturation_normalized <- saturation_fields[grep('saturation_normalized_', saturation_fields)]
-len_sum <- length(saturation_average)
-len_avg <- length(saturation_average)
-len_nrm <- length(saturation_normalized)
-saturation_average
-saturation_normalized
 
 all_fields <- c(id_fields, saturation_fields)
 all_types <- paste(id_types, saturation_types, sep='')
@@ -111,24 +211,27 @@ sum <- nrow(qa)
 
 print(paste(path, 'total records:', sum))
 
-qa[, 'saturation_sum'] <- apply(qa[, saturation_sum], 1, function(x) {sum(x)})
-qa[, 'saturation_average'] <- apply(qa[, saturation_average], 1, function(x) {sum(x) / len_avg})
-qa[, 'saturation_normalized'] <- apply(qa[, saturation_average], 1, function(x) {sum(x) / len_nrm})
-top_fields <- c('saturation_sum', 'saturation_average', 'saturation_normalized')
-
 if (opt$produceJson) {
   print(paste(path, "basic statistics"))
-  stat_names <- c(saturation_fields, top_fields)
-  stats <- round(stat.desc(qa[,stat_names], basic=TRUE), digits=4)
-  names(stats) <- tolower(names(stats))
+  stat_names <- saturation_fields #c(saturation_fields, top_fields)
   
-  stats <- stats[!(rownames(stats) %in% c("nbr.val", "nbr.null", "nbr.na", "sum")),]
-  stats <- data.frame(t(stats))
-  
-  for (name in stat_names) {
-    stats <- setMinMaxRecId(stats, qa, name)
-  }
+  removable_stats <- c('nbr.val', 'nbr.null', 'nbr.na', 'sum')
+  stats <- read.table(text = "1\n1\n1\n1\n1\n1\n1\n1\n1\n1\n1\n1", 
+                      colClasses = c('character'), col.names = c('dummy'))
+  for (field in stat_names) {
+    stat <- stat.desc(qa[qa[field] > -1, field], basic=TRUE)
+    recMin <- head(qa[qa[field] == stat[['min']], 'id'], 1)
+    recMax <- head(qa[qa[field] == stat[['max']], 'id'], 1)
+    stat <- round(stat, digits=4)
+    stat[['recMin']] <- recMin
+    stat[['recMax']] <- recMax
+    stat <- data.frame(stat[!names(stat) %in% removable_stats])
+    colnames(stat) <- tolower(field)
 
+    stats <- cbind(stats, stat)
+  }
+  stats <- stats[,colnames(stats) != 'dummy']
+  stats <- data.frame(t(stats))
   exportJson <- toJSON(stats)
   write(exportJson, paste(jsonOutputDir, '/', id, ".saturation.json", sep=""))
   rm(stats)
@@ -192,7 +295,6 @@ if (opt$drawSaturationGraph == TRUE) {
     # print(paste(path, "drawing saturation of", label))
     draw(qa, fieldName, label)
   }
-  top_fields
   warnings()
 }
 
