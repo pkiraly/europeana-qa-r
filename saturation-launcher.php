@@ -13,7 +13,7 @@
 
 define('MAX_THREADS', 7);
 define('SET_FILE_NAME', 'setlist.txt');
-define('R_OPTIONS', ' --drawSaturationGraph F --drawTopSaturationGraph T --calculateSaturation T --produceJson T');
+define('R_OPTIONS', ' --drawSaturationGraph T --drawTopSaturationGraph F --calculateSaturation T --produceJson T');
 
 $Rfile = 'saturation-extended.R';
 $endTime = time() + 60;
