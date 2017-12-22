@@ -7,8 +7,8 @@ library(jsonlite)
 library(plyr)
 library(psych)
 library(optparse)
-source("saturationOptions.R")
-source("draw2.R")
+source("R/saturationOptions.R")
+source("R/draw2.R")
 
 jsonOutputDir <- 'json2'
 startTime <- proc.time()
@@ -32,7 +32,17 @@ print(paste(rep('=', 30), collapse=''))
 id_fields <- c('id', 'collection', 'provider')
 id_types <- paste(rep('c', length(id_fields)), collapse='')
 
-specific_fields <- c(
+completeness_fields <- c(
+  'total', 'mandatory', 'descriptiveness', 'searchability', 'contextualization',
+  'identification', 'browsing', 'viewing', 'reusability', 'multilinguality'
+)
+completeness_labels <- c(
+  'All fields', 'Mandatory fields', 'Descriptiveness', 'Searchability', 'Contextualization',
+  'Identification', 'Browsing', 'Viewing', 'Reusability', 'Multilinguality'
+)
+completeness_types <- paste(rep('n', length(completeness_fields)), collapse='')
+
+saturation_fields <- c(
   'provider/dc:title/taggedLiterals', 'provider/dc:title/languages', 'provider/dc:title/literalsPerLanguage',
   'europeana/dc:title/taggedLiterals', 'europeana/dc:title/languages', 'europeana/dc:title/literalsPerLanguage',
   'provider/dcterms:alternative/taggedLiterals', 'provider/dcterms:alternative/languages', 'provider/dcterms:alternative/literalsPerLanguage',
@@ -135,25 +145,33 @@ specific_fields <- c(
   'europeana/edm:wasPresentAt/taggedLiterals', 'europeana/edm:wasPresentAt/languages', 'europeana/edm:wasPresentAt/literalsPerLanguage'
 );
 # add 'saturation_' prefix
-specific_fields <- gsub(':', '_', specific_fields)
-specific_fields <- gsub('/', '_', specific_fields)
-# print(specific_fields)
-# specific_fields <- paste0('saturation_', specific_fields)
-specific_types <- paste(rep('n', length(specific_fields)), collapse='')
+saturation_fields <- gsub(':', '_', saturation_fields)
+saturation_fields <- gsub('/', '_', saturation_fields)
+# print(saturation_fields)
+saturation_fields <- paste0('saturation2_', saturation_fields)
+saturation_types <- paste(rep('n', length(saturation_fields)), collapse='')
 
 generic_fields <- c(
-  'NumberOfLanguagesPerPropertyInProviderProxy', 'NumberOfLanguagesPerPropertyInEuropeanaProxy',
-  'NumberOfLanguagesPerPropertyInObject', 
-  'TaggedLiteralsInProviderProxy', 'TaggedLiteralsInEuropeanaProxy',
-  'DistinctLanguageCountInProviderProxy', 'DistinctLanguageCountInEuropeanaProxy', 
-  'TaggedLiteralsInObject', 'DistinctLanguagesInObject',
-  'TaggedLiteralsPerLanguageInProviderProxy', 'TaggedLiteralsPerLanguageInEuropeanaProxy',
-  'TaggedLiteralsPerLanguageInObject'
+  'Languages_per_Property_in_ProviderProxy', 
+  'Languages_per_Property_in_EuropeanaProxy',
+  'Languages_per_Property_in_Object',
+  'TaggedLiterals_in_ProviderProxy',
+  'TaggedLiterals_in_EuropeanaProxy',
+  'DistinctLanguages_in_ProviderProxy',
+  'DistinctLanguages_in_EuropeanaProxy', 
+  'TaggedLiterals_in_Object',
+  'DistinctLanguages_in_Object',
+  'TaggedLiterals_per_Language_in_ProviderProxy',
+  'TaggedLiterals_per_Language_in_EuropeanaProxy',
+  'TaggedLiterals_per_Language_in_Object'
 );
+generic_fields <- paste0('saturation2_', generic_fields)
 generic_types <- paste(rep('n', length(generic_fields)), collapse='')
 
-all_fields <- c(id_fields, specific_fields, generic_fields)
-all_types <- paste(id_types, specific_types, generic_types, sep='')
+all_fields <- c(id_fields, saturation_fields, generic_fields)
+all_types <- paste(id_types, saturation_types, generic_types, sep='')
+
+length(all_fields)
 
 qa <- read_csv(path, col_types = all_types, col_names = all_fields);
 
@@ -161,61 +179,54 @@ sum <- nrow(qa)
 
 print(paste(path, 'total records:', sum))
 
-field <- 'europeana_dc_title_taggedLiterals'
-removable_stats <- c('nbr.val', 'nbr.null', 'nbr.na', 'sum')
-
-# str(qa)
-# select(qa, c('NumberOfLanguagesPerPropertyInProviderProxy'))
-v <- as.vector(qa[,c('NumberOfLanguagesPerPropertyInProviderProxy')])
-str(as.vector(qa[field][field]))
-# head(qa)
-# stat <- stat.desc(qa[qa[field] > -1, field], basic=TRUE)
-# stat
-# recMin <- head(qa[qa[field] == stat['min',1], 'id'], 1)
-# recMax <- head(qa[qa[field] == stat['max',1], 'id'], 1)
-# stat <- round(stat, digits=4)
-# str(stat)
-
-# stat[c('min', 'max', 'range', 'sum', 'median', 'mean', 'SE.mean', 'CI.mean.0.95', 'var', 'std.dev', 'coef.var'),]
-
-# row_to_keep = c(F, F, F, T, T, T, T, T, T, T, T, T, T, T, T, T)
-# stat[row_to_keep,c('provider_dc_title_taggedLiterals')]
-# stat
-# stat <- data.frame(stat[!names(stat) %in% removable_stats])
-
-stopQuietly()
+# fieldName <- 'saturation2_TaggedLiterals_per_Language_in_Object'
+# ... do some test here on qa[fieldName > -1, fieldName] ...
+# stopQuietly()
 
 if (opt$produceJson) {
   print(paste(path, "basic statistics"))
-  # stat_names <- specific_fields #c(specific_fields, top_fields)
-  stat_names <- generic_fields #c(specific_fields, top_fields)
+  stat_names <- c(saturation_fields, generic_fields) #c(saturation_fields, top_fields)
   
   removable_stats <- c('nbr.val', 'nbr.null', 'nbr.na', 'sum')
-  stats <- read.table(text = "1\n1\n1\n1\n1\n1\n1\n1\n1\n1\n1\n1\n1\n1\n1\n1", 
+  stats <- read.table(text = "1\n1\n1\n1\n1\n1\n1\n1\n1\n1\n1\n1\n1\n1\n1\n1\n1\n1\n1\n1\n1\n1\n1\n1", 
                       colClasses = c('character'), col.names = c('dummy'))
-  print(paste(path, "/read.table"))
   for (field in stat_names) {
-    print(paste(path, "field:", field))
-    stat <- stat.desc(qa[qa[field] > -1, field], basic=TRUE)
-    stat
-    print(paste(path, "recMin"))
-    recMin <- head(qa[qa[field] == stat['min',1], 'id'], 1)
-    print(paste(path, "recMin", stat['min',1], recMin))
-    recMax <- head(qa[qa[field] == stat['max',1], 'id'], 1)
-    print(paste(path, "recMax", stat['max',1], recMax))
-
+    stat <- stat.desc(qa[qa[field] > -1, field], basic=TRUE) # pastecs
+    
+    # min/max record id
+    recMin <- head(qa[qa[field] == stat[['min']], 'id'], 1)
+    recMax <- head(qa[qa[field] == stat[['max']], 'id'], 1)
     stat <- round(stat, digits=4)
-    print(paste(path, "recMin"))
-    stat['recMin',1] <- recMin
-    print(paste(path, "recMax"))
-    stat['recMax',1] <- recMax
-    # stat <- data.frame(stat[!names(stat) %in% removable_stats])
+    stat[['recMin']] <- recMin
+    stat[['recMax']] <- recMax
+    
+    # quantiles
+    quantiles <- quantile(qa[field > -1, field])
+    stat[['Q1']] <- quantiles[2]
+    stat[['Q3']] <- quantiles[4]
+    
+    # other statistics
+    desc <- describe(qa[field > -1, field]) #psych
+    stat[['trimmedMean']] <- desc$trimmed
+    stat[['skew']] <- desc$skew
+    stat[['mad']] <- desc$mad
+    stat[['kurtosis']] <- desc$kurtosis
+    
+    # outliers
+    boxplot <- boxplot.stats(qa[field > -1, field])
+    stat[['boxplot.lower']] <- boxplot$stats[1]
+    stat[['boxplot.upper']] <- boxplot$stats[5]
+    #bp2
+    stat[['boxplot.out.n']] <- length(boxplot$out)
+    stat[['boxplot.out.perc']] <- length(boxplot$out) / boxplot$n * 100
+    stat[['boxplot.out.upper.n']] <- length(boxplot$out[boxplot$out > boxplot$stats[5]])
+    stat[['boxplot.out.lower.n']] <- length(boxplot$out[boxplot$out < boxplot$stats[1]])
+    
+    stat <- data.frame(stat[!names(stat) %in% removable_stats])
     colnames(stat) <- tolower(field)
 
-    print(paste(path, "cbind"))
     stats <- cbind(stats, stat)
   }
-  print(paste(path, "/for"))
   stats <- stats[,colnames(stats) != 'dummy']
   stats <- data.frame(t(stats))
   exportJson <- toJSON(stats)
@@ -225,15 +236,12 @@ if (opt$produceJson) {
   print(paste(path, "histograms"))
   histograms <- list()
   for (name in stat_names) {
-    print(paste(path, "histogram", name))
-    h <- hist(x = qa[,name], plot = FALSE, breaks = 8)
-    print(paste(path, "read.table"))
+    h <- hist(qa[,c(name)], plot = FALSE, breaks = 20)
     hist <- read.table(
       text = '',
       colClasses = c("character", "numeric", 'numeric'),
       col.names = c('label', 'count', 'density'),
       stringsAsFactors = FALSE)
-    print(paste(path, "for"))
     for (i in 1:length(h$counts)) {
       label <- paste(h$breaks[i], h$breaks[i + 1], sep = " - ")
       density <- h$counts[i] * 100 / sum
@@ -243,6 +251,29 @@ if (opt$produceJson) {
   }
   exportJson <- toJSON(histograms)
   write(exportJson, paste(jsonOutputDir, '/', id, ".saturation.histogram.json", sep=""))
+  rm(histograms)
+  
+  print(paste(path, "normalized histograms", format(Sys.time(), "%H:%M:%OS3")))
+  histograms <- list()
+  for (name in stat_names) {
+    normalized <- normalizeVector(qa[,c(name)], 20)
+    h <- hist(normalized$vector, plot = FALSE, breaks = normalized$breaks)
+    hist <- read.table(
+      text = '',
+      colClasses = c("character", "numeric", 'numeric'),
+      col.names = c('label', 'count', 'density'),
+      stringsAsFactors = FALSE)
+    for (i in 1:length(h$counts)) {
+      label <- paste(h$breaks[i], h$breaks[i + 1], sep = " - ")
+      density <- h$counts[i] * 100 / sum
+      hist[i, ] <- c(label, h$counts[i], density)
+    }
+    histograms[[tolower(name)]] <- hist
+  }
+  exportJson <- toJSON(histograms)
+  fileName <- paste0(jsonOutputDir, '/', id, ".saturation.normalized-histogram.json")
+  print(paste(path, 'saving', fileName, format(Sys.time(), "%H:%M:%OS3")))
+  write(exportJson, fileName)
   rm(histograms)
 
   print(paste(path, "frequency table"))
@@ -272,7 +303,8 @@ if (opt$produceJson) {
 
 if (opt$drawSaturationGraph == TRUE) {
   print(paste(path, "drawing saturation"))
-  for (fieldName in specific_fields) {
+  for (fieldName in saturation_fields) {
+    # fieldName <- paste0('saturation2-', fieldName)
     label <- gsub('_', ':',
                  sub('Aggregation_', 'Aggregation/',
                      sub('Proxy_', 'Proxy/',
@@ -280,24 +312,36 @@ if (opt$drawSaturationGraph == TRUE) {
                              sub('Place_', 'Place/',
                                  sub('Timespan_', 'Timespan/',
                                      sub('Concept_', 'Concept/',
-                                         sub('saturation_', '', fieldName))))))))
-    # print(paste(path, "drawing saturation of", label))
+                                         sub('europeana_', 'europeana/',
+                                             sub('provider_', 'provider/',
+                                                 sub('_literalsPerLanguage', '/literalsPerLanguage',
+                                                     sub('_taggedLiterals', '/taggedLiterals',
+                                                         sub('_languages', '/languages',
+                                                             sub('saturation2_', '', fieldName)))))))))))))
+    print(paste(path, "drawing saturation of", label, paste0('(', fieldName, ')')))
     draw(qa, fieldName, label)
+    print(paste(path, "drawing done"))
   }
   warnings()
+  print(paste(path, "/drawing saturation"))
 }
 
 if (opt$drawTopSaturationGraph == TRUE) {
   print(paste(path, "drawing top saturation"))
-  for (fieldName in top_fields) {
-    label <- fieldName
-    # print(paste(path, "drawing saturation of", label))
+  names(qa)
+  for (fieldName in generic_fields) {
+    label <- gsub('_', ' ', 
+                  sub('saturation2_', '', fieldName))
+    print(paste(path, "drawing saturation of", label, paste0('(', fieldName, ')')))
     draw(qa, fieldName, label)
   }
   warnings()
+  print(paste(path, "/drawing top saturation"))
 }
 
+print('warnings')
 warnings()
+print('/warnings')
 # stopQuietly()
 
 duration <- (proc.time() - startTime)
