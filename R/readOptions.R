@@ -26,6 +26,14 @@ option_list = list(
     help="calculate frequency tables"
   ),
   make_option(
+    c("-b", "--calculateBasicStatistics"), type="logical", default=TRUE, metavar="logical",
+    help="calculate basic statistics"
+  ),
+  make_option(
+    c("-i", "--calculateHistograms"), type="logical", default=TRUE, metavar="logical",
+    help="calculate histograms"
+  ),
+  make_option(
     c("-j", "--produceJson"), type="logical", default=TRUE, metavar="logical",
     help="produce JSON files"
   )
