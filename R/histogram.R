@@ -41,12 +41,12 @@ histograms <- list()
 fields_for_histograms <- c(
   completeness_fields,
   cardinality_fields,
-  problem_fields,
-  entropy_fields
+  problem_fields
 )
-for (name in cardinality_fields) {
+for (name in fields_for_histograms) {
   print(name)
   print(substr(name, 1, 4))
+  is_cardinality_field <- (substr(name, 1, 4) == "crd_")
   frequencies <- qa %>% 
     select(name) %>% 
     unlist(use.names = FALSE) %>% 
@@ -60,32 +60,44 @@ for (name in cardinality_fields) {
   if (zeros == 0) {
     frequencies[nrow(frequencies) + 1,] = list(0, 0)
   }
-  if (ones == 0) {
+  if (is_cardinality_field == TRUE && ones == 0) {
     frequencies[nrow(frequencies) + 1,] = list(1, 0)
   }
-  if (zeros == 0 || ones == 0) {
+  if (zeros == 0 || (is_cardinality_field == TRUE && ones == 0)) {
     frequencies <- frequencies %>% 
       arrange(label)
   }
-
+  
   if (dim(frequencies)[1] >= 10) {
     data <- qa %>% 
       select(name) %>% 
       unlist(use.names = FALSE)
-    data <- data[data > 1]
-
+    if (is_cardinality_field == TRUE) {
+      min_label <- 1
+      data <- data[data > 1]
+      number_of_bins <- 8
+    } else {
+      min_label <- 0.0
+      data <- data[data > 0.0]
+      number_of_bins <- 9
+    }
+    
+    print("min-max")
+    print(c(min(data), max(data)))
     hist <- data %>% 
-      hist(plot = FALSE, breaks = 8)
+      hist(plot = FALSE, breaks = number_of_bins)
     breaks <- hist$breaks
     breaks <- breaks[2:length(breaks)]
     counts <- hist$counts
 
     freq <- frequencies %>% 
-      filter(label <= 1)
+      filter(label <= min_label)
+
     freq$label <- as.character(freq$label)
     for (i in 1:length(breaks)) {
       freq[nrow(freq) + 1,] = list(paste0('<', breaks[i]), counts[i])
     }
+
     frequencies <- freq
   } else {
     frequencies$label <- as.character(frequencies$label)
