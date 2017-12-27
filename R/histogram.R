@@ -5,7 +5,7 @@ source("readOptions.R")
 source("completeness-field-definitions.R")
 source("draw2.R")
 
-jsonOutputDir <- 'json2'
+jsonOutputDir <- '../json2'
 startTime <- proc.time()
 
 path <- getFile(opt$inputFile)
