@@ -90,6 +90,7 @@ for (name in cardinality_fields) {
 }
 
 exportJson <- toJSON(histograms)
-fileName <- paste0(jsonOutputDir, '/', id, ".hist.json")
+fileName <- paste0(jsonOutputDir, '/', id, '/', id, ".hist.json")
+print(fileName)
 # write(exportJson, fileName)
 rm(histograms)
