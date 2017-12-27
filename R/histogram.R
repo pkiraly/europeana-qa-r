@@ -38,8 +38,15 @@ print(paste(path, 'total records:', sum))
 
 histograms <- list()
 
-for (name in cardinality_fields) {
+fields_for_histograms <- c(
+  completeness_fields,
+  cardinality_fields,
+  problem_fields,
+  entropy_fields
+)
+for (name in fields_for_histograms) {
   print(name)
+  print(substr(name, 1, 4))
   frequencies <- qa %>% 
     select(name) %>% 
     unlist(use.names = FALSE) %>% 
