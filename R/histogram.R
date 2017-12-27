@@ -36,6 +36,8 @@ print(dim(qa))
 sum <- nrow(qa)
 print(paste(path, 'total records:', sum))
 
+histograms <- list()
+
 for (name in cardinality_fields) {
   print(name)
   frequencies <- qa %>% 
@@ -82,6 +84,12 @@ for (name in cardinality_fields) {
     frequencies$label <- as.character(frequencies$label)
   }
   frequencies$density <- frequencies$count / sum
+  histograms[[tolower(name)]] <- frequencies
   exportJson <- toJSON(frequencies)
   print(exportJson);
 }
+
+exportJson <- toJSON(histograms)
+fileName <- paste0(jsonOutputDir, '/', id, ".hist.json")
+# write(exportJson, fileName)
+rm(histograms)
