@@ -44,7 +44,7 @@ fields_for_histograms <- c(
   problem_fields,
   entropy_fields
 )
-for (name in fields_for_histograms) {
+for (name in cardinality_fields) {
   print(name)
   print(substr(name, 1, 4))
   frequencies <- qa %>% 
@@ -97,7 +97,7 @@ for (name in fields_for_histograms) {
 }
 
 exportJson <- toJSON(histograms)
-fileName <- paste0(jsonOutputDir, '/', id, '/', id, ".hist.json")
+fileName <- paste0(jsonOutputDir, '/', id, '/', id, ".cardinality.histogram.json")
 print(fileName)
-# write(exportJson, fileName)
+write(exportJson, fileName)
 rm(histograms)
