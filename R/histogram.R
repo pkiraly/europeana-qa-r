@@ -38,14 +38,15 @@ print(paste(path, 'total records:', sum))
 
 histograms <- list()
 
-fields_for_histograms <- c(
-  completeness_fields,
-  cardinality_fields,
-  problem_fields
-)
+fields_for_histograms <- c(completeness_fields, cardinality_fields, problem_fields)
+
+is.wholenumber <-
+  function(x, tol = .Machine$double.eps^0.5)  abs(x - round(x)) < tol
+isAnInteger <-
+  function(x) length(x[is.wholenumber(x) == FALSE]) == 0
+
 for (name in fields_for_histograms) {
-  print(name)
-  print(substr(name, 1, 4))
+  # if (name != 'total') next
   is_cardinality_field <- (substr(name, 1, 4) == "crd_")
   frequencies <- qa %>% 
     select(name) %>% 
@@ -54,6 +55,7 @@ for (name in fields_for_histograms) {
     as.data.frame()
   names(frequencies) <- c('label', 'count')
   frequencies$label <- as.numeric(as.character(frequencies$label))
+  isInteger <- isAnInteger(frequencies$label)
 
   zeros <- frequencies %>% filter(label == 0) %>% nrow()
   ones <- frequencies %>% filter(label == 1) %>% nrow()
@@ -79,11 +81,9 @@ for (name in fields_for_histograms) {
     } else {
       min_label <- 0.0
       data <- data[data > 0.0]
-      number_of_bins <- 9
+      number_of_bins <- 8
     }
     
-    print("min-max")
-    print(c(min(data), max(data)))
     hist <- data %>% 
       hist(plot = FALSE, breaks = number_of_bins)
     breaks <- hist$breaks
@@ -95,7 +95,33 @@ for (name in fields_for_histograms) {
 
     freq$label <- as.character(freq$label)
     for (i in 1:length(breaks)) {
-      freq[nrow(freq) + 1,] = list(paste0('<', breaks[i]), counts[i])
+      if (isInteger) {
+        if (i == 1) {
+          prev <- min_label + 1
+        } else {
+          prev <- breaks[i-1] + 1
+        }
+        if (prev < breaks[i]) {
+          label <- paste0(prev, '-', breaks[i])
+        } else if (prev == breaks[i]) {
+          label = breaks[i]
+        } else {
+          label <- paste0('<', breaks[i])
+        }
+      } else {
+        if (i == 1) {
+          prev <- as.numeric(min_label)
+        } else {
+          prev <- as.numeric(breaks[i-1])
+        }
+        min <- frequencies %>% filter(label > prev) %>% min()
+        if (min < breaks[i]) {
+          label <- paste0(min, '-', breaks[i])
+        } else {
+          label <- breaks[i]
+        }
+      }
+      freq[nrow(freq) + 1,] = list(label, counts[i])
     }
 
     frequencies <- freq
@@ -104,8 +130,8 @@ for (name in fields_for_histograms) {
   }
   frequencies$density <- frequencies$count / sum
   histograms[[tolower(name)]] <- frequencies
-  exportJson <- toJSON(frequencies)
-  print(exportJson);
+  # exportJson <- toJSON(frequencies)
+  # print(exportJson);
 }
 
 exportJson <- toJSON(histograms)
