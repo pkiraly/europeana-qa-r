@@ -7,6 +7,7 @@ library(jsonlite)
 library(plyr)
 library(psych)
 library(optparse)
+library(tidyverse)
 source("R/saturationOptions.R")
 source("R/draw2.R")
 
@@ -188,39 +189,44 @@ if (opt$produceJson) {
   stat_names <- c(saturation_fields, generic_fields) #c(saturation_fields, top_fields)
   
   removable_stats <- c('nbr.val', 'nbr.null', 'nbr.na', 'sum')
-  stats <- read.table(text = "1\n1\n1\n1\n1\n1\n1\n1\n1\n1\n1\n1\n1\n1\n1\n1\n1\n1\n1\n1\n1\n1\n1\n1", 
+  stats <- read.table(text = "1\n1\n1\n1\n1\n1\n1\n1\n1\n1\n1\n1\n1\n1\n1\n1\n1\n1\n1\n1\n1\n1\n1\n1\n1\n1\n1\n1", 
                       colClasses = c('character'), col.names = c('dummy'))
   for (field in stat_names) {
-    stat <- stat.desc(qa[qa[field] > -1, field], basic=TRUE) # pastecs
-    
+    valueVector <- qa %>% 
+      filter(field > -1) %>% 
+      pull(field)
+
+    stat <- as.data.frame(stat.desc(valueVector, basic=TRUE)) # pastecs
     # min/max record id
-    recMin <- head(qa[qa[field] == stat[['min']], 'id'], 1)
-    recMax <- head(qa[qa[field] == stat[['max']], 'id'], 1)
+    minValue <- stat[c('min'),1]
+    recMin <- head(qa[qa[field] == minValue, 'id'], 1)
+    maxValue <- stat[c('max'),1]
+    recMax <- head(qa[qa[field] == maxValue, 'id'], 1)
     stat <- round(stat, digits=4)
-    stat[['recMin']] <- recMin
-    stat[['recMax']] <- recMax
+    stat[c('recMin'),1] <- recMin
+    stat[c('recMax'),1] <- recMax
     
     # quantiles
-    quantiles <- quantile(qa[field > -1, field])
-    stat[['Q1']] <- quantiles[2]
-    stat[['Q3']] <- quantiles[4]
+    quantiles <- as.data.frame(quantile(valueVector))
+    stat[c('Q1'),1] <- quantiles[2,1]
+    stat[c('Q3'),1] <- quantiles[4,1]
     
     # other statistics
-    desc <- describe(qa[field > -1, field]) #psych
-    stat[['trimmedMean']] <- desc$trimmed
-    stat[['skew']] <- desc$skew
-    stat[['mad']] <- desc$mad
-    stat[['kurtosis']] <- desc$kurtosis
+    desc <- as.data.frame(describe(valueVector)) #psych
+    stat[c('trimmedMean'),1] <- desc$trimmed[1]
+    stat[c('skew'),1] <- desc$skew[1]
+    stat[c('mad'),1] <- desc$mad[1]
+    stat[c('kurtosis'),1] <- desc$kurtosis[1]
     
     # outliers
-    boxplot <- boxplot.stats(qa[field > -1, field])
-    stat[['boxplot.lower']] <- boxplot$stats[1]
-    stat[['boxplot.upper']] <- boxplot$stats[5]
+    boxplot <- boxplot.stats(valueVector)
+    stat[c('boxplot.lower'),1] <- boxplot$stats[1]
+    stat[c('boxplot.upper'),1] <- boxplot$stats[5]
     #bp2
-    stat[['boxplot.out.n']] <- length(boxplot$out)
-    stat[['boxplot.out.perc']] <- length(boxplot$out) / boxplot$n * 100
-    stat[['boxplot.out.upper.n']] <- length(boxplot$out[boxplot$out > boxplot$stats[5]])
-    stat[['boxplot.out.lower.n']] <- length(boxplot$out[boxplot$out < boxplot$stats[1]])
+    stat[c('boxplot.out.n'),1] <- length(boxplot$out)
+    stat[c('boxplot.out.perc'),1] <- length(boxplot$out) / boxplot$n * 100
+    stat[c('boxplot.out.upper.n'),1] <- length(boxplot$out[boxplot$out > boxplot$stats[5]])
+    stat[c('boxplot.out.lower.n'),1] <- length(boxplot$out[boxplot$out < boxplot$stats[1]])
     
     stat <- data.frame(stat[!names(stat) %in% removable_stats])
     colnames(stat) <- tolower(field)
@@ -236,7 +242,9 @@ if (opt$produceJson) {
   print(paste(path, "histograms"))
   histograms <- list()
   for (name in stat_names) {
-    h <- hist(qa[,c(name)], plot = FALSE, breaks = 20)
+    valueVector <- qa %>% 
+      pull(field)
+    h <- hist(valueVector, plot = FALSE, breaks = 20)
     hist <- read.table(
       text = '',
       colClasses = c("character", "numeric", 'numeric'),
@@ -256,7 +264,10 @@ if (opt$produceJson) {
   print(paste(path, "normalized histograms", format(Sys.time(), "%H:%M:%OS3")))
   histograms <- list()
   for (name in stat_names) {
-    normalized <- normalizeVector(qa[,c(name)], 20)
+    valueVector <- qa %>% 
+      pull(field)
+
+    normalized <- normalizeVector(valueVector, 20)
     h <- hist(normalized$vector, plot = FALSE, breaks = normalized$breaks)
     hist <- read.table(
       text = '',
@@ -280,7 +291,9 @@ if (opt$produceJson) {
   frequencyTable <- list()
   for (field in all_fields) {
     if (field != 'id' && field != 'collection' && field != 'provider') {
-      freq <- count(qa, field)
+      freq <- as.data.frame(table(qa[,field]))
+      names(freq) <- c(field, 'freq')
+      # freq <- count(qa, field)
       rows <- list()
       for (i in 1:dim(freq)[[1]]) {
         key <- as.character(freq[i, field])
@@ -328,7 +341,6 @@ if (opt$drawSaturationGraph == TRUE) {
 
 if (opt$drawTopSaturationGraph == TRUE) {
   print(paste(path, "drawing top saturation"))
-  names(qa)
   for (fieldName in generic_fields) {
     label <- gsub('_', ' ', 
                   sub('saturation2_', '', fieldName))
