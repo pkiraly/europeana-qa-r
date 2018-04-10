@@ -2,6 +2,7 @@
 
 $fileName = $argv[1];
 $in = fopen($fileName, "r");
+$dir = '/projects/pkiraly/2018-03-23/split/saturation';
 $out = [];
 $ln = 1;
 while (($line = fgets($in)) != false) {
@@ -20,7 +21,7 @@ while (($line = fgets($in)) != false) {
       }
       $out[$file][] = $line;
       if (count($out[$file]) == 500) {
-        file_put_contents('saturation/' . $file . '.csv', join("", $out[$file]), FILE_APPEND);
+        file_put_contents($dir . '/' . $file . '.csv', join("", $out[$file]), FILE_APPEND);
         unset($out[$file]);
       }
     }
@@ -29,7 +30,7 @@ while (($line = fgets($in)) != false) {
 fclose($in);
 
 foreach ($out as $file => $lines) {
-  file_put_contents('saturation/' . $file . '.csv', join("", $lines), FILE_APPEND);
+  file_put_contents($dir . '/' . $file . '.csv', join("", $lines), FILE_APPEND);
 }
 
 echo 'DONE', "\n";

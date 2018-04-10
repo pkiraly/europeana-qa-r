@@ -4,14 +4,14 @@ library(ggplot2)
 library(grid)
 library(gridExtra)
 library(jsonlite)
-library(plyr)
+library(dplyr)
 library(psych)
 library(optparse)
-source("readOptions.R")
-source("completeness-field-definitions.R")
-source("draw2.R")
+source("R/readOptions.R")
+source("R/completeness-field-definitions.R")
+source("R/draw2.R")
 
-jsonOutputDir <- 'json2'
+jsonOutputDir <- 'json3'
 startTime <- proc.time()
 
 path <- getFile(opt$inputFile)
@@ -23,6 +23,14 @@ parts <- unlist(strsplit(path, '/', fixed = TRUE))
 file <- parts[length(parts)]
 id <- getId(file)
 
+ifelse(
+  !dir.exists(file.path(jsonOutputDir, id)), 
+  dir.create(file.path(jsonOutputDir, id)),
+  FALSE
+)
+
+print(paste(path, 'file:', file))
+print(paste(path, 'id:', id))
 print(paste(path, 'draw completeness graph:', opt$drawCompletenessGraph))
 print(paste(path, 'draw entropy graph:', opt$drawEntropyGraph))
 print(paste(path, 'calculate existence:', opt$calculateExistence))
@@ -48,7 +56,7 @@ if (opt$produceJson) {
   count <- data.frame(count)
   collector[["count"]][['count']] <- sum
   exportJson <- toJSON(count)
-  write(exportJson, paste(jsonOutputDir, '/', id, ".count.json", sep=""))
+  write(exportJson, paste(jsonOutputDir, '/', id, '/', id, ".count.json", sep=""))
   rm(count)
 }
 
@@ -75,7 +83,7 @@ if (opt$produceJson && opt$calculateExistence) {
   }
   collector[["frequencies"]] <- frequencies
   exportJson <- toJSON(frequencies)
-  write(exportJson, paste(jsonOutputDir, '/', id, ".freq.json", sep=""))
+  write(exportJson, paste(jsonOutputDir, '/', id, '/', id, ".freq.json", sep=""))
   rm(frequencies)
 }
 # ENDS field existency process
@@ -88,7 +96,7 @@ if (opt$produceJson && opt$calculateCardinalities) {
                             col.names = c('field', 'count', 'sum', 'mean', 'median'))
 
   for (fieldName in cardinality_fields) {
-    xs <- qa[,fieldName];
+    xs <- pull(qa, fieldName);
     fieldCount <- length(xs[xs > 0])
     fieldSum <- sum(xs)
     fieldMean <- mean(xs)
@@ -98,7 +106,7 @@ if (opt$produceJson && opt$calculateCardinalities) {
   }
   collector[["cardinalities"]] <- cardinalities
   exportJson <- toJSON(cardinalities)
-  write(exportJson, paste(jsonOutputDir, '/', id, ".cardinality.json", sep=""))
+  write(exportJson, paste(jsonOutputDir, '/', id, '/', id, ".cardinality.json", sep=""))
   rm(cardinalities)
 }
 # ENDS field cardinality process
@@ -109,11 +117,11 @@ if (opt$produceJson && opt$calculateFrequencyTables) {
 
   for (field in all_fields) {
     if (field != 'id' && field != 'collection' && field != 'provider') {
-      freq <- count(qa, field)
+      freq <- as.data.frame(table(qa[, field]))
       rows <- list()
-      for (i in 1:dim(freq)[[1]]) {
-        key <- as.character(freq[i, field])
-        rows[[key]] <- freq[i, 'freq'][[1]]
+      for (i in 1:dim(freq)[1]) {
+        key <- as.character(freq[i, 'Var1'])
+        rows[[key]] <- freq[i, 'Freq'][[1]]
       }
       frequencyTable[[field]] <- rows
     }
@@ -121,7 +129,7 @@ if (opt$produceJson && opt$calculateFrequencyTables) {
 
   collector[["frequencyTable"]] <- frequencyTable
   exportJson <- toJSON(frequencyTable)
-  jsonFileName <- paste0(jsonOutputDir, '/', id, '.frequency.table.json');
+  jsonFileName <- paste0(jsonOutputDir, '/', id, '/', id, '.frequency.table.json');
   write(exportJson, jsonFileName)
   rm(frequencyTable)
   rm(jsonFileName)
@@ -143,7 +151,7 @@ if (opt$produceJson && opt$calculateBasicStatistics) {
   }
   collector[["stats"]] <- stats
   exportJson <- toJSON(stats)
-  write(exportJson, paste(jsonOutputDir, '/', id, ".json", sep=""))
+  write(exportJson, paste(jsonOutputDir, '/', id, '/', id, ".json", sep=""))
   rm(stats)
 }
 
@@ -152,10 +160,8 @@ if (opt$produceJson && opt$calculateHistograms) {
   histograms <- list()
   stat_names <- c(completeness_fields, cardinality_fields, problem_fields)
   for (name in stat_names) {
-    print(name)
-    print('h')
-    h <- hist(qa[,c(name)], plot = FALSE, breaks = 8)
-    print('/h')
+    x <- pull(qa, name)
+    h <- hist(x, plot = FALSE, breaks = 8)
     hist <- read.table(text = '', colClasses = c("character", "numeric", 'numeric'), col.names = c('label', 'count', 'density'),
                        stringsAsFactors = FALSE)
     for (i in 1:length(h$counts)) {
@@ -167,11 +173,13 @@ if (opt$produceJson && opt$calculateHistograms) {
   }
   collector[["histograms"]] <- histograms
   exportJson <- toJSON(histograms)
-  write(exportJson, paste(jsonOutputDir, '/', id, ".hist.json", sep=""))
+  jsonFileName <- paste0(jsonOutputDir, '/', id, '/', id, ".hist.json")
+  write(exportJson, jsonFileName)
   rm(histograms)
-
+  rm(jsonFileName)
+  
   exportJson <- toJSON(collector)
-  write(exportJson, paste(jsonOutputDir, '/', id, ".collector.json", sep=""))
+  write(exportJson, paste(jsonOutputDir, '/', id, '/', id, ".collector.json", sep=""))
   rm(collector)
 }
 
@@ -207,6 +215,7 @@ if (opt$drawCompletenessGraph == TRUE) {
   }
   warnings()
 }
+print(paste(path, "/histograms"))
 
 ################################
 # drawing entropy fields
@@ -220,7 +229,9 @@ if (opt$drawEntropyGraph == TRUE) {
   warnings()
 }
 
+print(paste(path, "warnings:"))
 warnings()
+print(paste(path, "/warnings"))
 # stopQuietly()
 
 duration <- (proc.time() - startTime)
