@@ -1,11 +1,11 @@
-library(tidyverse)
-library(jsonlite)
-library(optparse)
-source("readOptions.R")
-source("completeness-field-definitions.R")
-source("draw2.R")
+library(tidyverse, warn.conflicts = FALSE, quietly = TRUE, verbose = FALSE)
+library(jsonlite, warn.conflicts = FALSE, quietly = TRUE, verbose = FALSE)
+library(optparse, warn.conflicts = FALSE, quietly = TRUE, verbose = FALSE)
+source("R/readOptions.R")
+source("R/completeness-field-definitions.R")
+source("R/draw2.R")
 
-jsonOutputDir <- '../json2'
+jsonOutputDir <- 'json-2018-03'
 startTime <- proc.time()
 
 path <- getFile(opt$inputFile)
@@ -28,11 +28,11 @@ print(paste(path, 'produce JSON files:', opt$produceJson))
 
 print(paste(rep('=', 30), collapse=''))
 
-print("read_csv")
+# print("read_csv")
 qa <- read_csv(path, col_types = all_types, col_names = all_fields);
-print("/read_csv")
+# print("/read_csv")
 
-print(dim(qa))
+# print(dim(qa))
 sum <- nrow(qa)
 print(paste(path, 'total records:', sum))
 
@@ -136,6 +136,12 @@ for (name in fields_for_histograms) {
 
 exportJson <- toJSON(histograms)
 fileName <- paste0(jsonOutputDir, '/', id, '/', id, ".cardinality.histogram.json")
-print(fileName)
+print(paste(path, 'output filename:', fileName))
 write(exportJson, fileName)
 rm(histograms)
+
+duration <- (proc.time() - startTime)
+print(paste(path, "Finished", "@", format(Sys.time(), "%H:%M:%OS3"),
+            sprintf("time: %s, user: %s, sys: %s",
+                    duration['elapsed'][[1]], duration['user.self'][[1]], duration['sys.self'][[1]])))
+rm(list=ls())

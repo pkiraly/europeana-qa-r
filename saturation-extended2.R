@@ -11,7 +11,7 @@ library(tidyverse)
 source("R/saturationOptions.R")
 source("R/draw2.R")
 
-jsonOutputDir <- 'json2'
+jsonOutputDir <- 'json3'
 startTime <- proc.time()
 
 path <- getFile(opt$inputFile)
@@ -22,6 +22,12 @@ print(paste('path:', path, "Start", "@", format(Sys.time(), "%H:%M:%OS3")))
 parts <- unlist(strsplit(path, '/', fixed = TRUE))
 file <- parts[length(parts)]
 id <- getId(file)
+
+ifelse(
+  !dir.exists(file.path(jsonOutputDir, id)), 
+  dir.create(file.path(jsonOutputDir, id)),
+  FALSE
+)
 
 print(paste(path, 'draw saturation graph:', opt$drawSaturationGraph))
 print(paste(path, 'calculate saturation:', opt$calculateSaturation))
@@ -236,7 +242,7 @@ if (opt$produceJson) {
   stats <- stats[,colnames(stats) != 'dummy']
   stats <- data.frame(t(stats))
   exportJson <- toJSON(stats)
-  write(exportJson, paste(jsonOutputDir, '/', id, ".saturation.json", sep=""))
+  write(exportJson, paste(jsonOutputDir, '/', id, '/', id, ".saturation.json", sep=""))
   rm(stats)
 
   print(paste(path, "histograms"))
@@ -258,7 +264,7 @@ if (opt$produceJson) {
     histograms[[tolower(name)]] <- hist
   }
   exportJson <- toJSON(histograms)
-  write(exportJson, paste(jsonOutputDir, '/', id, ".saturation.histogram.json", sep=""))
+  write(exportJson, paste(jsonOutputDir, '/', id, '/', id, ".saturation.histogram.json", sep=""))
   rm(histograms)
   
   print(paste(path, "normalized histograms", format(Sys.time(), "%H:%M:%OS3")))
@@ -282,7 +288,7 @@ if (opt$produceJson) {
     histograms[[tolower(name)]] <- hist
   }
   exportJson <- toJSON(histograms)
-  fileName <- paste0(jsonOutputDir, '/', id, ".saturation.normalized-histogram.json")
+  fileName <- paste0(jsonOutputDir, '/', id, '/', id, ".saturation.normalized-histogram.json")
   print(paste(path, 'saving', fileName, format(Sys.time(), "%H:%M:%OS3")))
   write(exportJson, fileName)
   rm(histograms)
@@ -303,7 +309,7 @@ if (opt$produceJson) {
     }
   }
   exportJson <- toJSON(frequencyTable)
-  jsonFileName <- paste0(jsonOutputDir, '/', id, '.saturation.frequency.table.json');
+  jsonFileName <- paste0(jsonOutputDir, '/', id, '/', id, '.saturation.frequency.table.json');
   print(paste(path, 'saving', jsonFileName))
   write(exportJson, jsonFileName)
   rm(frequencyTable)
