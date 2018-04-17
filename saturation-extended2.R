@@ -199,7 +199,6 @@ if (opt$produceJson) {
   stats <- read.table(text = "1\n1\n1\n1\n1\n1\n1\n1\n1\n1\n1\n1\n1\n1\n1\n1\n1\n1\n1\n1\n1\n1\n1\n1\n1\n1\n1\n1", 
                       colClasses = c('character'), col.names = c('dummy'))
   for (field in stat_names) {
-    print(field)
     valueVector <- qa %>% 
       filter(field > -1) %>% 
       pull(field)
@@ -207,11 +206,8 @@ if (opt$produceJson) {
     nonNAs <- length(valueVector)
     
     stat <- as.data.frame(stat.desc(valueVector, basic=TRUE)) # pastecs
-    if (field == 'saturation2_europeana_dc_title_taggedLiterals' || field == 'saturation2_europeana_dc_creator_taggedLiterals') {
-      print(stat)
-    }
+
     # min/max record id
-    print('min/max')
     if (nonNAs == 0) {
       recMin <- head(qa[qa[field] == -1, 'id'], 1)
       recMax <- recMin
@@ -224,18 +220,13 @@ if (opt$produceJson) {
     }
     stat[c('recMin'),1] <- recMin
     stat[c('recMax'),1] <- recMax
-    if (field == 'saturation2_europeana_dc_title_taggedLiterals' || field == 'saturation2_europeana_dc_creator_taggedLiterals') {
-      print(stat)
-    }
-    
+
     # quantiles
-    print('quantiles')
     quantiles <- as.data.frame(quantile(valueVector))
     stat[c('Q1'),1] <- quantiles[2,1]
     stat[c('Q3'),1] <- quantiles[4,1]
     
     # other statistics
-    print('other')
     desc <- as.data.frame(describe(valueVector)) #psych
     stat[c('trimmedMean'),1] <- desc$trimmed[1]
     stat[c('skew'),1] <- desc$skew[1]
@@ -243,7 +234,6 @@ if (opt$produceJson) {
     stat[c('kurtosis'),1] <- desc$kurtosis[1]
     
     # outliers
-    print('outliers')
     boxplot <- boxplot.stats(valueVector)
     stat[c('boxplot.lower'),1] <- boxplot$stats[1]
     stat[c('boxplot.upper'),1] <- boxplot$stats[5]
@@ -253,7 +243,6 @@ if (opt$produceJson) {
     stat[c('boxplot.out.upper.n'),1] <- length(boxplot$out[boxplot$out > boxplot$stats[5]])
     stat[c('boxplot.out.lower.n'),1] <- length(boxplot$out[boxplot$out < boxplot$stats[1]])
     
-    print('put')
     stat <- data.frame(stat[!names(stat) %in% removable_stats])
     colnames(stat) <- tolower(field)
 
