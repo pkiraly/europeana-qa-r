@@ -191,6 +191,10 @@ print(paste(path, 'total records:', sum))
 # stopQuietly()
 
 field <- 'saturation2_europeana_dc_creator_taggedLiterals'
+rawValues <- qa %>% 
+  pull(field)
+str(rawValues)
+
 valueVector <- qa %>% 
   filter(field > -1) %>% 
   pull(field)
