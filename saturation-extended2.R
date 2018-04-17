@@ -196,8 +196,8 @@ rawValues <- qa %>%
 str(rawValues)
 
 valueVector <- qa %>% 
-  pull(field) %>% 
-  filter(field > -1)
+  filter(field > -1.0) %>% 
+  pull(field)
 str(valueVector)
 
 stat <- as.data.frame(stat.desc(valueVector, basic=TRUE)) # pastecs
