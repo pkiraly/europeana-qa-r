@@ -1,3 +1,4 @@
+library(tidyverse, warn.conflicts = FALSE, quietly = TRUE, verbose = FALSE)
 library(readr, warn.conflicts = FALSE, quietly = TRUE, verbose = FALSE)
 library(pastecs, warn.conflicts = FALSE, quietly = TRUE, verbose = FALSE)
 library(ggplot2, warn.conflicts = FALSE, quietly = TRUE, verbose = FALSE)
@@ -7,7 +8,6 @@ library(jsonlite, warn.conflicts = FALSE, quietly = TRUE, verbose = FALSE)
 library(plyr, warn.conflicts = FALSE, quietly = TRUE, verbose = FALSE)
 library(psych, warn.conflicts = FALSE, quietly = TRUE, verbose = FALSE)
 library(optparse, warn.conflicts = FALSE, quietly = TRUE, verbose = FALSE)
-library(tidyverse, warn.conflicts = FALSE, quietly = TRUE, verbose = FALSE)
 source("R/saturationOptions.R")
 source("R/draw2.R")
 
@@ -203,8 +203,9 @@ if (opt$produceJson) {
       pull(field)
     
     stat <- as.data.frame(stat.desc(valueVector, basic=TRUE)) # pastecs
-    if (field == 'saturation2_europeana_dc_title_taggedLiterals') {
+    if (field == 'saturation2_europeana_dc_creator_taggedLiterals') {
       print(stat)
+      print(valueVector)
     }
     # min/max record id
     minValue <- stat[c('min'),1]
