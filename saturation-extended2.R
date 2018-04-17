@@ -199,10 +199,12 @@ valueVector <- qa %>%
   filter(field > -1.0) %>% 
   pull(field)
 str(valueVector)
+filtered <- valueVector[valueVector > -1]
+str(filtered)
 
-stat <- as.data.frame(stat.desc(valueVector, basic=TRUE)) # pastecs
+stat <- as.data.frame(stat.desc(filtered, basic=TRUE)) # pastecs
 print(stat)
-print(valueVector)
+# print(valueVector)
 stopQuietly()
 
 if (opt$produceJson) {
