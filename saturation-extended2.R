@@ -204,21 +204,29 @@ if (opt$produceJson) {
       filter(field > -1) %>% 
       pull(field)
     valueVector <- valueVector[valueVector > -1]
+    nonNAs <- length(valueVector)
     
     stat <- as.data.frame(stat.desc(valueVector, basic=TRUE)) # pastecs
     if (field == 'saturation2_europeana_dc_title_taggedLiterals' || field == 'saturation2_europeana_dc_creator_taggedLiterals') {
       print(stat)
-      print(length(valueVector))
     }
     # min/max record id
     print('min/max')
-    minValue <- stat[c('min'),1]
-    recMin <- head(qa[qa[field] == minValue, 'id'], 1)
-    maxValue <- stat[c('max'),1]
-    recMax <- head(qa[qa[field] == maxValue, 'id'], 1)
-    stat <- round(stat, digits=4)
+    if (nonNAs == 0) {
+      recMin <- head(qa[qa[field] == -1, 'id'], 1)
+      recMax <- recMin
+    } else {
+      minValue <- stat[c('min'),1]
+      recMin <- head(qa[qa[field] == minValue, 'id'], 1)
+      maxValue <- stat[c('max'),1]
+      recMax <- head(qa[qa[field] == maxValue, 'id'], 1)
+      stat <- round(stat, digits=4)
+    }
     stat[c('recMin'),1] <- recMin
     stat[c('recMax'),1] <- recMax
+    if (field == 'saturation2_europeana_dc_title_taggedLiterals' || field == 'saturation2_europeana_dc_creator_taggedLiterals') {
+      print(stat)
+    }
     
     # quantiles
     print('quantiles')
