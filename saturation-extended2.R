@@ -190,23 +190,6 @@ print(paste(path, 'total records:', sum))
 # ... do some test here on qa[fieldName > -1, fieldName] ...
 # stopQuietly()
 
-field <- 'saturation2_europeana_dc_creator_taggedLiterals'
-rawValues <- qa %>% 
-  pull(field)
-str(rawValues)
-
-valueVector <- qa %>% 
-  filter(field > -1.0) %>% 
-  pull(field)
-str(valueVector)
-filtered <- valueVector[valueVector > -1]
-str(filtered)
-
-stat <- as.data.frame(stat.desc(filtered, basic=TRUE)) # pastecs
-print(stat)
-# print(valueVector)
-stopQuietly()
-
 if (opt$produceJson) {
   print(paste(path, "basic statistics"))
   stat_names <- c(saturation_fields, generic_fields) #c(saturation_fields, top_fields)
@@ -218,11 +201,11 @@ if (opt$produceJson) {
     valueVector <- qa %>% 
       filter(field > -1) %>% 
       pull(field)
+    valueVector <- valueVector[valueVector > -1]
     
     stat <- as.data.frame(stat.desc(valueVector, basic=TRUE)) # pastecs
     if (field == 'saturation2_europeana_dc_creator_taggedLiterals') {
       print(stat)
-      print(valueVector)
     }
     # min/max record id
     minValue <- stat[c('min'),1]
