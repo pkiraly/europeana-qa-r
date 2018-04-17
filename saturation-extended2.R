@@ -190,6 +190,16 @@ print(paste(path, 'total records:', sum))
 # ... do some test here on qa[fieldName > -1, fieldName] ...
 # stopQuietly()
 
+field <- 'saturation2_europeana_dc_creator_taggedLiterals'
+valueVector <- qa %>% 
+  filter(field > -1) %>% 
+  pull(field)
+
+stat <- as.data.frame(stat.desc(valueVector, basic=TRUE)) # pastecs
+print(stat)
+print(valueVector)
+stopQuietly()
+
 if (opt$produceJson) {
   print(paste(path, "basic statistics"))
   stat_names <- c(saturation_fields, generic_fields) #c(saturation_fields, top_fields)
