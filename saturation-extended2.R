@@ -206,7 +206,7 @@ if (opt$produceJson) {
     valueVector <- valueVector[valueVector > -1]
     
     stat <- as.data.frame(stat.desc(valueVector, basic=TRUE)) # pastecs
-    if (field == 'saturation2_europeana_dc_creator_taggedLiterals') {
+    if (field == 'saturation2_europeana_dc_title_taggedLiterals' || field == 'saturation2_europeana_dc_creator_taggedLiterals') {
       print(stat)
     }
     # min/max record id
