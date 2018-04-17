@@ -176,7 +176,6 @@ generic_fields <- paste0('saturation2_', generic_fields)
 generic_types <- paste(rep('n', length(generic_fields)), collapse='')
 
 all_fields <- c(id_fields, saturation_fields, generic_fields)
-print(all_fields)
 all_types <- paste(id_types, saturation_types, generic_types, sep='')
 
 length(all_fields)
