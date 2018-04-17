@@ -176,6 +176,7 @@ generic_fields <- paste0('saturation2_', generic_fields)
 generic_types <- paste(rep('n', length(generic_fields)), collapse='')
 
 all_fields <- c(id_fields, saturation_fields, generic_fields)
+print(all_fields)
 all_types <- paste(id_types, saturation_types, generic_types, sep='')
 
 length(all_fields)
@@ -209,6 +210,7 @@ if (opt$produceJson) {
       print(stat)
     }
     # min/max record id
+    print('min/max')
     minValue <- stat[c('min'),1]
     recMin <- head(qa[qa[field] == minValue, 'id'], 1)
     maxValue <- stat[c('max'),1]
@@ -218,11 +220,13 @@ if (opt$produceJson) {
     stat[c('recMax'),1] <- recMax
     
     # quantiles
+    print('quantiles')
     quantiles <- as.data.frame(quantile(valueVector))
     stat[c('Q1'),1] <- quantiles[2,1]
     stat[c('Q3'),1] <- quantiles[4,1]
     
     # other statistics
+    print('other')
     desc <- as.data.frame(describe(valueVector)) #psych
     stat[c('trimmedMean'),1] <- desc$trimmed[1]
     stat[c('skew'),1] <- desc$skew[1]
@@ -230,6 +234,7 @@ if (opt$produceJson) {
     stat[c('kurtosis'),1] <- desc$kurtosis[1]
     
     # outliers
+    print('outliers')
     boxplot <- boxplot.stats(valueVector)
     stat[c('boxplot.lower'),1] <- boxplot$stats[1]
     stat[c('boxplot.upper'),1] <- boxplot$stats[5]
@@ -239,6 +244,7 @@ if (opt$produceJson) {
     stat[c('boxplot.out.upper.n'),1] <- length(boxplot$out[boxplot$out > boxplot$stats[5]])
     stat[c('boxplot.out.lower.n'),1] <- length(boxplot$out[boxplot$out < boxplot$stats[1]])
     
+    print('put')
     stat <- data.frame(stat[!names(stat) %in% removable_stats])
     colnames(stat) <- tolower(field)
 
