@@ -61,12 +61,15 @@ isAnInteger <-
 
 for (name in uniqueness_fields) {
   # if (name != 'total') next
+  print(name)
   frequencies <- qa %>% 
     select(name) %>% 
     unlist(use.names = FALSE) %>% 
     table() %>% 
     as.data.frame()
   names(frequencies) <- c('label', 'count')
+  print(frequencies)
+  
   frequencies$label <- as.numeric(as.character(frequencies$label))
   isInteger <- isAnInteger(frequencies$label)
   
@@ -78,7 +81,7 @@ for (name in uniqueness_fields) {
   if (ones == 0) {
     frequencies[nrow(frequencies) + 1,] = list(1, 0)
   }
-  if (zeros == 0 || (ones == 0)) {
+  if (zeros == 0 || ones == 0) {
     frequencies <- frequencies %>% 
       arrange(label)
   }
