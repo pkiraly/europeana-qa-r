@@ -87,16 +87,10 @@ for (name in uniqueness_fields) {
     data <- qa %>% 
       select(name) %>% 
       unlist(use.names = FALSE)
-    if (is_cardinality_field == TRUE) {
-      min_label <- 1
-      data <- data[data > 1]
-      number_of_bins <- 8
-    } else {
-      min_label <- 0.0
-      data <- data[data > 0.0]
-      number_of_bins <- 8
-    }
-    
+    min_label <- 0.0
+    data <- data[data > 0.0]
+    number_of_bins <- 8
+
     hist <- data %>% 
       hist(plot = FALSE, breaks = number_of_bins)
     breaks <- hist$breaks
