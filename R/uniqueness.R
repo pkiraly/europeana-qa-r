@@ -75,10 +75,10 @@ for (name in uniqueness_fields) {
   if (zeros == 0) {
     frequencies[nrow(frequencies) + 1,] = list(0, 0)
   }
-  if (is_cardinality_field == TRUE && ones == 0) {
+  if (ones == 0) {
     frequencies[nrow(frequencies) + 1,] = list(1, 0)
   }
-  if (zeros == 0 || (is_cardinality_field == TRUE && ones == 0)) {
+  if (zeros == 0 || (ones == 0)) {
     frequencies <- frequencies %>% 
       arrange(label)
   }
