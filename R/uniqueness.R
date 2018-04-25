@@ -72,11 +72,11 @@ for (name in uniqueness_fields) {
 
   bins <- allbins[[name]]
   frequencies <- data.frame(label=character(), count=numeric(), percent=numeric)
-  total <- length(data)
+  total <- length(data[data > 0.0])
   for (i in 1:6) {
     label <- ifelse(i == 1, 1, ifelse(i == 6, paste0(bins[i], '-'), paste0(bins[i], '-', bins[i+1] - 1)))
     count <- length(data[data >= bins[i] & data < bins[i+1]])
-    percent <- count / total
+    percent <- ifelse(total == 0, 0, count / total)
     frequencies <- rbind(frequencies, data.frame(label=label, count=count, percent=percent))
   }
   histograms[[tolower(name)]] <- frequencies
