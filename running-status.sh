@@ -16,6 +16,10 @@ if [ "$TYPE" = "saturation" ]; then
   LAST_FILE=`tail -100 launch-report.log | grep -oP "(?<=saturation/)(\w+\.csv)" | tail -1`
   STARTED=`grep -n $LAST_FILE saturation-master-setlist.txt | awk -F: '{print $1}'`
   FILES=`ps aux | grep -oP "(?<=inputFile \/projects\/pkiraly\/2018-03-23\/split\/saturation\/).+\.csv" | sed ':a;N;$!ba;s/\n/--/g'`
+elif [ "$TYPE" = "uniqueness" ]; then
+  LAST_FILE=`tail -100 launch-report.log | grep -oP "(?<=uniqueness/)(\w+\.csv)" | tail -1`
+  STARTED=`grep -n $LAST_FILE uniqueness-master-setlist.txt | awk -F: '{print $1}'`
+  FILES=`ps aux | grep -oP "(?<=inputFile \/projects\/pkiraly\/2018-03-23\/split\/uniqueness\/).+\.csv" | sed ':a;N;$!ba;s/\n/--/g'`
 else
   LAST_FILE=`tail -10 launch-report.log | grep -oP "(?<=data/)(\w+\.csv)" | tail -1`
   if [ "$LAST_FILE" != "" ]; then

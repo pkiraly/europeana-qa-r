@@ -53,7 +53,7 @@ function launch_threads($running_threads) {
     file_put_contents(SET_FILE_NAME, $contents);
     foreach ($files as $file) {
       printf("%s launching set: %s, remaining sets: %d\n", date("Y-m-d H:i:s"), $file, count($lines));
-      echo 'nohup Rscript R/uniqueness.R --inputFile ' . $file . ' ' . $all_parameters . ' >>r-report.log 2>>r-report.log &' . "\n";
+      # echo 'nohup Rscript R/uniqueness.R --inputFile ' . $file . ' ' . $all_parameters . ' >>r-report.log 2>>r-report.log &' . "\n";
       exec('nohup Rscript R/uniqueness.R --inputFile ' . $file . ' ' . $all_parameters . ' >>r-report.log 2>>r-report.log &');
     }
   }
