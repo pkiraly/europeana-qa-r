@@ -46,6 +46,10 @@ print(paste(path, 'produce JSON files:', opt$produceJson))
 
 print(paste(rep('=', 30), collapse=''))
 
+allbins <- read_csv("uniqueness.allbins.csv")
+print(allbins)
+stop("stop")
+
 qa <- read_csv(path, col_types = all_types, col_names = all_fields);
 
 sum <- nrow(qa)
