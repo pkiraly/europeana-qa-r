@@ -51,7 +51,7 @@ print(allbins)
 for (name in uniqueness_fields) {
   print(name)
   row <- allbins %>% 
-    filter(name = name)
+    filter(name == name)
   print(row)
 }
 stop("stop")
