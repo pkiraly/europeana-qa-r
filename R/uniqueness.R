@@ -50,9 +50,9 @@ allbins <- read_csv("uniqueness.allbins.csv")
 print(allbins)
 for (name in uniqueness_fields) {
   print(name)
-  row <- allbins %>% 
-    filter(name = name)
-  print(row)
+  #row <- allbins %>% 
+  #  filter(name = name)
+  #print(row)
 }
 stop("stop")
 
