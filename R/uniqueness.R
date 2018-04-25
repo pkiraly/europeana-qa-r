@@ -46,14 +46,11 @@ print(paste(path, 'produce JSON files:', opt$produceJson))
 
 print(paste(rep('=', 30), collapse=''))
 
-allbins <- read_csv("uniqueness.allbins.csv")
-print(allbins)
+allbins_row <- as.data.frame(read_csv("uniqueness.allbins.csv"))
+allbins <- list()
 for (name in uniqueness_fields) {
-  print(name)
-  row <- unname(unlist(allbins[allbins$name == name,c('x1', 'x2', 'x20', 'x40', 'x60', 'x80', 'x100')]))
-  print(row)
+  allbins[[name]] <- unlist(unname(allbins_row[allbins_row$name == name,c('x1', 'x2', 'x20', 'x40', 'x60', 'x80', 'x100')]))
 }
-stop("stop")
 
 qa <- read_csv(path, col_types = all_types, col_names = all_fields);
 
@@ -69,88 +66,20 @@ isAnInteger <-
   function(x) length(x[is.wholenumber(x) == FALSE]) == 0
 
 for (name in uniqueness_fields) {
-  # if (name != 'total') next
-  print(name)
-  frequencies <- qa %>% 
+  data <- qa %>% 
     select(name) %>% 
-    unlist(use.names = FALSE) %>% 
-    table() %>% 
-    as.data.frame()
-  names(frequencies) <- c('label', 'count')
-  print(frequencies)
-  
-  frequencies$label <- as.numeric(as.character(frequencies$label))
-  isInteger <- isAnInteger(frequencies$label)
-  
-  zeros <- frequencies %>% filter(label == 0) %>% nrow()
-  ones <- frequencies %>% filter(label == 1) %>% nrow()
-  if (zeros == 0) {
-    frequencies[nrow(frequencies) + 1,] = list(0, 0)
-  }
-  if (ones == 0) {
-    frequencies[nrow(frequencies) + 1,] = list(1, 0)
-  }
-  if (zeros == 0 || ones == 0) {
-    frequencies <- frequencies %>% 
-      arrange(label)
-  }
-  
-  if (dim(frequencies)[1] >= 10) {
-    data <- qa %>% 
-      select(name) %>% 
-      unlist(use.names = FALSE)
-    min_label <- 0.0
-    data <- data[data > 0.0]
-    number_of_bins <- 8
+    unlist(use.names = FALSE)
 
-    hist <- data %>% 
-      hist(plot = FALSE, breaks = number_of_bins)
-    breaks <- hist$breaks
-    breaks <- breaks[2:length(breaks)]
-    counts <- hist$counts
-    
-    freq <- frequencies %>% 
-      filter(label <= min_label)
-    
-    freq$label <- as.character(freq$label)
-    for (i in 1:length(breaks)) {
-      if (isInteger) {
-        if (i == 1) {
-          prev <- min_label + 1
-        } else {
-          prev <- breaks[i-1] + 1
-        }
-        if (prev < breaks[i]) {
-          label <- paste0(prev, '-', breaks[i])
-        } else if (prev == breaks[i]) {
-          label = breaks[i]
-        } else {
-          label <- paste0('<', breaks[i])
-        }
-      } else {
-        if (i == 1) {
-          prev <- as.numeric(min_label)
-        } else {
-          prev <- as.numeric(breaks[i-1])
-        }
-        min <- frequencies %>% filter(label > prev) %>% min()
-        if (min < breaks[i]) {
-          label <- paste0(min, '-', breaks[i])
-        } else {
-          label <- breaks[i]
-        }
-      }
-      freq[nrow(freq) + 1,] = list(label, counts[i])
-    }
-    
-    frequencies <- freq
-  } else {
-    frequencies$label <- as.character(frequencies$label)
+  bins <- allbins[[name]]
+  frequencies <- data.frame(label=character(), count=numeric(), percent=numeric)
+  total <- length(data)
+  for (i in 1:6) {
+    label <- ifelse(i == 1, 1, ifelse(i == 6, paste0(bins[i], '-'), paste0(bins[i], '-', bins[i+1] - 1)))
+    count <- length(data[data >= bins[i] & data < bins[i+1]])
+    percent <- count / total
+    frequencies <- rbind(frequencies, data.frame(label=label, count=count, percent=percent))
   }
-  frequencies$density <- frequencies$count / sum
   histograms[[tolower(name)]] <- frequencies
-  # exportJson <- toJSON(frequencies)
-  # print(exportJson);
 }
 
 exportJson <- toJSON(histograms)
