@@ -48,6 +48,11 @@ print(paste(rep('=', 30), collapse=''))
 
 allbins <- read_csv("uniqueness.allbins.csv")
 print(allbins)
+for (name in uniqueness_fields) {
+  row <- allbins %>% 
+    filter(field = name)
+  print(row)
+}
 stop("stop")
 
 qa <- read_csv(path, col_types = all_types, col_names = all_fields);
