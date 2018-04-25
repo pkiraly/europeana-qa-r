@@ -50,7 +50,7 @@ allbins <- read_csv("uniqueness.allbins.csv")
 print(allbins)
 for (name in uniqueness_fields) {
   print(name)
-  row <- allbins[allbins$name == name,]
+  row <- allbins[allbins$name == name,c('x1', 'x2', 'x20', 'x40', 'x60', 'x80', 'x100')]
   print(row)
 }
 stop("stop")
