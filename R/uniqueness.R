@@ -82,13 +82,23 @@ for (name in uniqueness_fields) {
     frequencies <- rbind(frequencies, data.frame(label=label, count=count, percent=percent))
   }
 
+  score_field <- paste0(name, '_score')
+  data <- qa %>% 
+    select(score_field) %>% 
+    unlist(use.names = FALSE)
+
   result <- list()
   max <- ifelse(total == 0, 0, max(data))
   min <- ifelse(total == 0, 0, min(data))
-  qa2 <- as.data.frame(qa %>% select(id, value=name))
+  qa2 <- as.data.frame(qa %>% select(id, value=score_field))
   recMin <- qa2[qa2$value == min,][1,1]
   recMax <- qa2[qa2$value == max,][1,1]
-  result$statistics <- data.frame(mean=mean(data), sd=sd(data), min=min, recMin=recMin, max=max, recMax=recMax)
+  result$statistics <- data.frame(
+    n=total,
+    mean=mean(data), sd=sd(data),
+    min=min, recMin=recMin,
+    max=max, recMax=recMax
+  )
   result$frequencies <- frequencies
 
   histograms[[tolower(name)]] <- result
