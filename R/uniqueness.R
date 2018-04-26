@@ -70,6 +70,8 @@ for (name in uniqueness_fields) {
     select(name) %>% 
     unlist(use.names = FALSE)
 
+  data <- data[data > 0.0]
+
   bins <- allbins[[name]]
   frequencies <- data.frame(label=character(), count=numeric(), percent=numeric)
   total <- length(data[data > 0.0])
@@ -79,7 +81,17 @@ for (name in uniqueness_fields) {
     percent <- ifelse(total == 0, 0, count / total)
     frequencies <- rbind(frequencies, data.frame(label=label, count=count, percent=percent))
   }
-  histograms[[tolower(name)]] <- frequencies
+
+  result <- list()
+  max <- ifelse(total == 0, 0, max(data))
+  min <- ifelse(total == 0, 0, min(data))
+  qa2 <- as.data.frame(qa %>% select(id, value=name))
+  recMin <- qa2[qa2$value == min,][1,1]
+  recMax <- qa2[qa2$value == max,][1,1]
+  result$statistics <- data.frame(mean=mean(data), sd=sd(data), min=min, recMin=recMin, max=max, recMax=recMax)
+  result$frequencies <- frequencies
+
+  histograms[[tolower(name)]] <- result
 }
 
 exportJson <- toJSON(histograms)
