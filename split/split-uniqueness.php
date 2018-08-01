@@ -4,6 +4,7 @@ $fileName = $argv[1];
 $in = fopen($fileName, "r");
 $dir = '/projects/pkiraly/2018-03-23/split/uniqueness';
 $out = [];
+// $intersections = ['c' => [], 'd' => []];
 $ln = 1;
 while (($line = fgets($in)) != false) {
   if (strpos($line, ',') != false) {
@@ -11,10 +12,13 @@ while (($line = fgets($in)) != false) {
       echo number_format($ln), ' ';
     }
     $row = str_getcsv($line);
-    $files = array(
-      'c' . $row[1],
-      'd' . $row[2]
-    );
+    $c = $row[1];
+    $d = $row[2];
+    $files = [
+      sprintf('c%s', $c),
+      sprintf('d%s', $d),
+      sprintf('cd-%d-%d', $c, $d),
+    ];
     foreach ($files as $file) {
       if (!isset($out[$file])) {
         $out[$file] = [];

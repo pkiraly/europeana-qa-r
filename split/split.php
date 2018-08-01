@@ -15,8 +15,8 @@ while (($line = fgets($in)) != false) {
     $c = $row[1];
     $d = $row[2];
     $files = [
-      'c' . $c,
-      'd' . $d,
+      sprintf('c%s', $c),
+      sprintf('d%s', $d),
       sprintf('cd-%d-%d', $c, $d),
     ];
 
