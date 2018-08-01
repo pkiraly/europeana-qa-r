@@ -8,7 +8,7 @@ $ln = 1;
 while (($line = fgets($in)) != false) {
   if (strpos($line, ',') != false) {
     if ($ln++ % 100000 == 0) {
-      echo $ln, ' ';
+      echo number_format($ln), ' ';
     }
     $row = str_getcsv($line);
     $files = array(
