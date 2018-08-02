@@ -1,5 +1,6 @@
 <?php
 
+$start = microtime(TRUE);
 $fileName = $argv[1];
 $in = fopen($fileName, "r");
 $dir = '/projects/pkiraly/2018-03-23/split/completeness';
@@ -48,3 +49,6 @@ foreach ($out as $file => $lines) {
 }
 
 file_put_contents($dir . '/../intersections.json', json_encode($intersections));
+
+$duration = microtime(TRUE) - $start;
+echo 'DONE in ', gmdate("H:i:s", (int)$duration), "\n";
