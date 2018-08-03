@@ -266,12 +266,14 @@ if (opt$produceJson) {
   print(paste(path, "writing to", jsonFileName, format(Sys.time(), "%H:%M:%OS3")))
   write(exportJson, jsonFileName)
   rm(stats)
+}
 
-  print('warnings')
-  warnings()
-  options(ow) # reset
-  print('/warnings')
+print('warnings')
+warnings()
+options(ow) # reset
+print('/warnings')
 
+if (opt$produceJson) {
   print(paste(path, "histograms"))
   histograms <- list()
   for (name in stat_names) {
@@ -295,12 +297,14 @@ if (opt$produceJson) {
   print(paste(path, "writing to", jsonFileName, format(Sys.time(), "%H:%M:%OS3")))
   write(exportJson, jsonFileName)
   rm(histograms)
+}
 
-  print('warnings')
-  warnings()
-  options(ow) # reset
-  print('/warnings')
+print('warnings')
+warnings()
+options(ow) # reset
+print('/warnings')
   
+if (opt$produceJson) {
   print(paste(path, "normalized histograms", format(Sys.time(), "%H:%M:%OS3")))
   histograms <- list()
   for (name in stat_names) {
@@ -326,12 +330,14 @@ if (opt$produceJson) {
   print(paste(path, 'writing to', jsonFileName, format(Sys.time(), "%H:%M:%OS3")))
   write(exportJson, jsonFileName)
   rm(histograms)
+}
 
-  print('warnings')
-  warnings()
-  options(ow) # reset
-  print('/warnings')
+print('warnings')
+warnings()
+options(ow) # reset
+print('/warnings')
 
+if (opt$produceJson) {
   print(paste(path, "frequency table"))
   frequencyTable <- list()
   for (field in all_fields) {
@@ -353,11 +359,6 @@ if (opt$produceJson) {
   write(exportJson, jsonFileName)
   rm(frequencyTable)
   rm(jsonFileName)
-  
-  print('warnings')
-  warnings()
-  options(ow) # reset
-  print('/warnings')
 }
 
 print('warnings')
