@@ -219,7 +219,7 @@ if (opt$produceJson) {
     
     if (nonNAs == 0) {
       print("is nonNAs 0")
-      # valueVector <- c(-1, -1, -1)
+      valueVector <- c(-1)
       stat <- as.data.frame(tibble(
         'nbr.val' = 1,
         'nbr.null' = 0,
@@ -283,6 +283,7 @@ if (opt$produceJson) {
     stat[c('Q3'),1] <- quantiles[4,1]
     
     # other statistics
+    print("other statistics")
     desc <- as.data.frame(describe(valueVector)) #psych
     stat[c('trimmedMean'),1] <- desc$trimmed[1]
     stat[c('skew'),1] <- desc$skew[1]
@@ -290,6 +291,7 @@ if (opt$produceJson) {
     stat[c('kurtosis'),1] <- desc$kurtosis[1]
     
     # outliers
+    print("outliers")
     boxplot <- boxplot.stats(valueVector)
     stat[c('boxplot.lower'),1] <- boxplot$stats[1]
     stat[c('boxplot.upper'),1] <- boxplot$stats[5]
