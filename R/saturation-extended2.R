@@ -210,7 +210,7 @@ if (opt$produceJson) {
   stats <- read.table(text = "1\n1\n1\n1\n1\n1\n1\n1\n1\n1\n1\n1\n1\n1\n1\n1\n1\n1\n1\n1\n1\n1\n1\n1\n1\n1\n1\n1", 
                       colClasses = c('character'), col.names = c('dummy'))
   for (field in stat_names) {
-    # print(paste("field:", field))
+    print(paste("field:", field))
     valueVector <- qa %>% 
       filter(field > -1) %>% 
       pull(field)
@@ -220,8 +220,10 @@ if (opt$produceJson) {
       valueVector <- c(-1, -1, -1)
     }
     
+    print("stat.desc")
     stat <- as.data.frame(stat.desc(valueVector, basic=TRUE)) # pastecs
-
+    print("/stat.desc")
+    
     # min/max record id
     if (nonNAs == 0) {
       recMin <- head(qa[qa[field] == -1, 'id'], 1)
