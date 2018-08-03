@@ -191,7 +191,7 @@ sum <- nrow(qa)
 
 print(paste(path, 'total records:', sum))
 
-ow <- options("warn")
+ow <- options("warn" = 1)
 print('warnings')
 warnings()
 options(ow) # reset
