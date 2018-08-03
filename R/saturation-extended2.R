@@ -220,7 +220,9 @@ if (opt$produceJson) {
     nonNAs <- length(valueVector)
     print(paste("nonNAs", nonNAs))
     if (nonNAs == 0) {
-      print(valueVector)
+      valueVector2 <- qa %>% 
+        pull(field)
+      print(valueVector2)
     }
     
     print("stat.desc")
