@@ -220,17 +220,26 @@ if (opt$produceJson) {
       print("is nonNAs 0")
       valueVector <- c(-1, -1, -1)
     }
-    
+    if (nonNAs == 1) {
+      valueVector = c(valueVector[1], valueVector[1])
+    }
+      
     if (field == "saturation2_europeana_dc_type_taggedLiterals") {
+      print("valueVector")
       print(valueVector)
+      print("nonNAs")
       print(nonNAs)
+      print("dim")
       print(dim(valueVector))
     }
     
     print("stat.desc")
     stat <- as.data.frame(stat.desc(valueVector, basic=TRUE)) # pastecs
     print("/stat.desc")
-    
+
+    if (field == "saturation2_europeana_dc_type_taggedLiterals") {
+      print(stat)
+    }
     # min/max record id
     if (nonNAs == 0) {
       recMin <- head(qa[qa[field] == -1, 'id'], 1)
