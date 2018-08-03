@@ -360,6 +360,10 @@ if (opt$produceJson) {
   print('/warnings')
 }
 
+print('warnings')
+warnings()
+print('/warnings')
+
 ################################
 # drawing saturation fields
 ################################
@@ -388,6 +392,10 @@ if (opt$drawSaturationGraph == TRUE) {
   warnings()
   print(paste(path, "/drawing saturation"))
 }
+
+print('warnings')
+warnings()
+print('/warnings')
 
 if (opt$drawTopSaturationGraph == TRUE) {
   print(paste(path, "drawing top saturation"))
