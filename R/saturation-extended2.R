@@ -210,25 +210,18 @@ if (opt$produceJson) {
   stats <- read.table(text = "1\n1\n1\n1\n1\n1\n1\n1\n1\n1\n1\n1\n1\n1\n1\n1\n1\n1\n1\n1\n1\n1\n1\n1\n1\n1\n1\n1", 
                       colClasses = c('character'), col.names = c('dummy'))
   for (field in stat_names) {
-    print(paste("field:", field))
     valueVector <- qa %>% 
       filter(field > -1) %>% 
       pull(field)
-    print("valueVector")
     valueVector <- valueVector[valueVector > -1]
-    print("length")
     nonNAs <- length(valueVector)
-    print(paste("nonNAs", nonNAs))
     if (nonNAs == 0) {
       valueVector <- c(-1)
-      print(stat.desc(valueVector, basic=TRUE))
     }
     
-    print("stat.desc")
     stat <- as.data.frame(stat.desc(valueVector, basic=TRUE)) # pastecs
 
     # min/max record id
-    print("if (nonNAs)")
     if (nonNAs == 0) {
       recMin <- head(qa[qa[field] == -1, 'id'], 1)
       recMax <- recMin
@@ -239,13 +232,10 @@ if (opt$produceJson) {
       recMax <- head(qa[qa[field] == maxValue, 'id'], 1)
       stat <- round(stat, digits=4)
     }
-    print("recMin")
     stat[c('recMin'),1] <- recMin
-    print("recMax")
     stat[c('recMax'),1] <- recMax
 
     # quantiles
-    print("quantile")
     quantiles <- as.data.frame(quantile(valueVector))
     stat[c('Q1'),1] <- quantiles[2,1]
     stat[c('Q3'),1] <- quantiles[4,1]
