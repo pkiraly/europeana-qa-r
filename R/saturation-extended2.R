@@ -185,13 +185,13 @@ all_types <- paste(id_types, saturation_types, generic_types, sep='')
 
 length(all_fields)
 
+ow <- options("warn" = 2)
 qa <- read_csv(path, col_types = all_types, col_names = all_fields);
 
 sum <- nrow(qa)
 
 print(paste(path, 'total records:', sum))
 
-ow <- options("warn" = 1)
 print('warnings')
 warnings()
 options(ow) # reset
