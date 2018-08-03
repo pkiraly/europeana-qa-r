@@ -14,7 +14,7 @@
 define('OUTPUT_DIRECTORY', 'json-2018-03');
 define('MAX_THREADS', 7);
 define('SET_FILE_NAME', 'setlist.txt');
-define('CMD_TEMPLATE', 'nohup Rscript saturation-extended2.R --inputFile %s %s >>r-report.log 2>>r-report.log &');
+define('CMD_TEMPLATE', 'nohup Rscript R/saturation-extended2.R --inputFile %s %s >>r-report.log 2>>r-report.log &');
 
 $parameters = [
   '--outputDirectory ' . OUTPUT_DIRECTORY,
@@ -25,7 +25,7 @@ $parameters = [
 ];
 $all_parameters = join($parameters, ' ');
 
-$Rfile = 'saturation-extended2.R';
+$Rfile = 'R/saturation-extended2.R';
 $endTime = time() + 60;
 $i = 1;
 while (time() < $endTime) {
@@ -58,7 +58,7 @@ function launch_threads($running_threads) {
     foreach ($files as $file) {
       printf("%s launching set: %s, remaining sets: %d\n", date("Y-m-d H:i:s"), $file, count($lines));
       $cmd = sprintf(CMD_TEMPLATE, $file, $all_parameters);
-      // echo $cmd, "\n";
+      echo $cmd, "\n";
       exec($cmd);
     }
   }
