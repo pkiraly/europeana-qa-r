@@ -5,7 +5,7 @@ library(ggplot2, warn.conflicts = FALSE, quietly = TRUE, verbose = FALSE)
 library(grid, warn.conflicts = FALSE, quietly = TRUE, verbose = FALSE) # stat.desc
 library(gridExtra, warn.conflicts = FALSE, quietly = TRUE, verbose = FALSE)
 library(jsonlite, warn.conflicts = FALSE, quietly = TRUE, verbose = FALSE)
-library(plyr, warn.conflicts = FALSE, quietly = TRUE, verbose = FALSE)
+# library(plyr, warn.conflicts = FALSE, quietly = TRUE, verbose = FALSE)
 library(psych, warn.conflicts = FALSE, quietly = TRUE, verbose = FALSE)
 library(optparse, warn.conflicts = FALSE, quietly = TRUE, verbose = FALSE)
 source("R/saturationOptions.R")
