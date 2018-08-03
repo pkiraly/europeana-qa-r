@@ -277,6 +277,7 @@ if (opt$produceJson) {
     stat[c('recMax'),1] <- recMax
 
     # quantiles
+    print("quantiles")
     quantiles <- as.data.frame(quantile(valueVector))
     stat[c('Q1'),1] <- quantiles[2,1]
     stat[c('Q3'),1] <- quantiles[4,1]
