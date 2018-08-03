@@ -6,6 +6,10 @@ option_list = list(
     help="input file (.csv)"
   ),
   make_option(
+    c("-d", "--outputDirectory"), type="character", default=NULL, metavar="character",
+    help="base output directory"
+  ),
+  make_option(
     c("-s", "--calculateSaturation"), type="logical", default=TRUE, metavar="logical",
     help="calculate saturation"
   ),

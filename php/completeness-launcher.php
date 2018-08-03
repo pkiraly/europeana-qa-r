@@ -6,7 +6,6 @@
 define('OUTPUT_DIRECTORY', 'json-2018-03');
 define('MAX_THREADS', 10);
 define('SET_FILE_NAME', 'setlist.txt');
-define('R_SCRIPT', 'get-histograms-and-stats2.R');
 define('CMD_TEMPLATE', 'nohup Rscript R/get-histograms-and-stats2.R --inputFile %s %s >>r-report.log 2>>r-report.log &');
 
 $parameters = [

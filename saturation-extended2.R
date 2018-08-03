@@ -11,7 +11,12 @@ library(optparse, warn.conflicts = FALSE, quietly = TRUE, verbose = FALSE)
 source("R/saturationOptions.R")
 source("R/draw2.R")
 
-jsonOutputDir <- 'json-2018-03'
+# jsonOutputDir <- 'json-2018-03'
+jsonOutputDir <- opt$outputDir
+if (!file.exists(jsonOutputDir)) {
+  stop(paste('output dir:', jsonOutputDir, "does not exist"))
+}
+
 startTime <- proc.time()
 
 path <- getFile(opt$inputFile)
