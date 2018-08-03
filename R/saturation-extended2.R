@@ -223,11 +223,9 @@ if (opt$produceJson) {
       valueVector <- c(-1, -1, -1)
     }
     
-    # print("stat.desc")
     stat <- as.data.frame(stat.desc(valueVector, basic=TRUE)) # pastecs
 
     # min/max record id
-    # print("if (nonNAs)")
     if (nonNAs == 0) {
       recMin <- head(qa[qa[field] == -1, 'id'], 1)
       recMax <- recMin
