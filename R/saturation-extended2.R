@@ -192,10 +192,10 @@ sum <- nrow(qa)
 
 print(paste(path, 'total records:', sum))
 
-print('warnings')
-warnings()
-options(ow) # reset
-print('/warnings')
+# print('warnings')
+# warnings()
+# options(ow) # reset
+# print('/warnings')
 
 # fieldName <- 'saturation2_TaggedLiterals_per_Language_in_Object'
 # ... do some test here on qa[fieldName > -1, fieldName] ...
@@ -268,10 +268,10 @@ if (opt$produceJson) {
   rm(stats)
 }
 
-print('warnings')
-warnings()
-options(ow) # reset
-print('/warnings')
+# print('warnings')
+# warnings()
+# options(ow) # reset
+# print('/warnings')
 
 if (opt$produceJson) {
   print(paste(path, "histograms"))
@@ -299,10 +299,10 @@ if (opt$produceJson) {
   rm(histograms)
 }
 
-print('warnings')
-warnings()
-options(ow) # reset
-print('/warnings')
+# print('warnings')
+# warnings()
+# options(ow) # reset
+# print('/warnings')
   
 if (opt$produceJson) {
   print(paste(path, "normalized histograms", format(Sys.time(), "%H:%M:%OS3")))
@@ -332,10 +332,10 @@ if (opt$produceJson) {
   rm(histograms)
 }
 
-print('warnings')
-warnings()
-options(ow) # reset
-print('/warnings')
+# print('warnings')
+# warnings()
+# options(ow) # reset
+# print('/warnings')
 
 if (opt$produceJson) {
   print(paste(path, "frequency table"))
@@ -361,9 +361,9 @@ if (opt$produceJson) {
   rm(jsonFileName)
 }
 
-print('warnings')
-warnings()
-print('/warnings')
+# print('warnings')
+# warnings()
+# print('/warnings')
 
 ################################
 # drawing saturation fields
@@ -394,9 +394,9 @@ if (opt$drawSaturationGraph == TRUE) {
   print(paste(path, "/drawing saturation"))
 }
 
-print('warnings')
-warnings()
-print('/warnings')
+# print('warnings')
+# warnings()
+# print('/warnings')
 
 if (opt$drawTopSaturationGraph == TRUE) {
   print(paste(path, "drawing top saturation"))
