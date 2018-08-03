@@ -1,17 +1,21 @@
-library(readr)
-library(pastecs)
-library(ggplot2)
-library(grid)
-library(gridExtra)
-library(jsonlite)
-library(dplyr)
-library(psych)
-library(optparse)
+# library(tidyverse, warn.conflicts = FALSE, quietly = TRUE, verbose = FALSE)
+library(readr, warn.conflicts = FALSE, quietly = TRUE, verbose = FALSE)
+library(pastecs, warn.conflicts = FALSE, quietly = TRUE, verbose = FALSE)
+library(ggplot2, warn.conflicts = FALSE, quietly = TRUE, verbose = FALSE)
+library(grid, warn.conflicts = FALSE, quietly = TRUE, verbose = FALSE)
+library(gridExtra, warn.conflicts = FALSE, quietly = TRUE, verbose = FALSE)
+library(jsonlite, warn.conflicts = FALSE, quietly = TRUE, verbose = FALSE)
+library(dplyr, warn.conflicts = FALSE, quietly = TRUE, verbose = FALSE)
+library(psych, warn.conflicts = FALSE, quietly = TRUE, verbose = FALSE)
+library(optparse, warn.conflicts = FALSE, quietly = TRUE, verbose = FALSE)
 source("R/readOptions.R")
 source("R/completeness-field-definitions.R")
 source("R/draw2.R")
 
-jsonOutputDir <- 'json3'
+jsonOutputDir <- opt$outputDir
+if (!file.exists(jsonOutputDir)) {
+  stop(paste('output dir:', jsonOutputDir, "does not exist"))
+}
 startTime <- proc.time()
 
 path <- getFile(opt$inputFile)

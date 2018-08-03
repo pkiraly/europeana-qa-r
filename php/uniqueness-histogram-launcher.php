@@ -20,7 +20,6 @@ $parameters = [
 ];
 $all_parameters = join($parameters, ' ');
 
-
 $endTime = time() + 60;
 $i = 1;
 while (time() < $endTime) {

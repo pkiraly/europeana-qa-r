@@ -3,8 +3,23 @@
  * cp master-setlist.txt setlist.txt
  */
 
+define('OUTPUT_DIRECTORY', 'json-2018-03');
 define('MAX_THREADS', 10);
 define('SET_FILE_NAME', 'setlist.txt');
+define('R_SCRIPT', 'get-histograms-and-stats2.R');
+define('CMD_TEMPLATE', 'nohup Rscript R/get-histograms-and-stats2.R --inputFile %s %s >>r-report.log 2>>r-report.log &');
+
+$parameters = [
+  '--outputDirectory ' . OUTPUT_DIRECTORY,
+  '--drawCompletenessGraph F',
+  '--drawEntropyGraph F',
+  '--produceJson T',
+  '--calculateExistence F',
+  '--calculateCardinalities F',
+  '--calculateFrequencyTables F',
+  '--calculateBasicStatistics F'
+];
+$all_parameters = join($parameters, ' ');
 
 $endTime = time() + 60;
 $i = 1;
@@ -20,6 +35,8 @@ while (time() < $endTime) {
 }
 
 function launch_threads($running_threads) {
+  global $all_parameters;
+
   if (filesize(SET_FILE_NAME) > 3) {
     $contents = file_get_contents(SET_FILE_NAME);
     $lines = explode("\n", $contents);
@@ -35,8 +52,9 @@ function launch_threads($running_threads) {
     file_put_contents('setlist.txt', $contents);
     foreach ($files as $file) {
       printf("%s launching set: %s, remaining sets: %d\n", date("Y-m-d H:i:s"), $file, count($lines));
-      // echo 'nohup Rscript R/get-histograms-and-stats2.R --inputFile ' . $file . ' --drawCompletenessGraph F --drawEntropyGraph F --produceJson T >>r-report.log 2>>r-report.log', "\n";
-      exec('nohup Rscript R/get-histograms-and-stats2.R --inputFile ' . $file . ' --drawCompletenessGraph F --drawEntropyGraph F --produceJson T >>r-report.log 2>>r-report.log &');
+      $cmd = sprintf(CMD_TEMPLATE, $file, $all_parameters);
+      // echo $cmd, "\n";
+      exec($cmd);
     }
   }
 }
