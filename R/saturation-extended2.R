@@ -210,7 +210,7 @@ if (opt$produceJson) {
   stats <- read.table(text = "1\n1\n1\n1\n1\n1\n1\n1\n1\n1\n1\n1\n1\n1\n1\n1\n1\n1\n1\n1\n1\n1\n1\n1\n1\n1\n1\n1", 
                       colClasses = c('character'), col.names = c('dummy'))
   for (field in stat_names) {
-    print(paste("field:", field))
+    # print(paste("field:", field))
     valueVector <- qa %>% 
       filter(field > -1) %>% 
       pull(field)
