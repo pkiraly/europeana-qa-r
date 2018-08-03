@@ -217,6 +217,7 @@ if (opt$produceJson) {
     valueVector <- valueVector[valueVector > -1]
     nonNAs <- length(valueVector)
     if (nonNAs == 0) {
+      print("is nonNAs 0")
       valueVector <- c(-1, -1, -1)
     }
     
