@@ -222,7 +222,7 @@ if (opt$produceJson) {
     }
     
     if (field == "saturation2_europeana_dc_type_taggedLiterals") {
-      print(valueVector)
+      print(dim(valueVector))
     }
     
     print("stat.desc")
