@@ -216,27 +216,49 @@ if (opt$produceJson) {
       pull(field)
     valueVector <- valueVector[valueVector > -1]
     nonNAs <- length(valueVector)
+    
     if (nonNAs == 0) {
       print("is nonNAs 0")
-      valueVector <- c(-1, -1, -1)
-    }
-    if (nonNAs == 1) {
-      valueVector = c(valueVector[1], valueVector[1])
+      # valueVector <- c(-1, -1, -1)
+      stat <- as.data.frame(tibble(
+        'nbr.val' = 1,
+        'nbr.null' = 0,
+        'nbr.na' = 0,
+        'min' = 0,
+        'max' = 0,
+        'range' = 0,
+        'sum' = 0,
+        'median' = 0,
+        'mean' = 0,
+        'SE.mean' = 0,
+        'CI.mean.0.95' = 0,
+        'var' = 0,
+        'std.dev' = 0,
+        'coef.var' = 0
+      ))
+    } else if (nonNAs == 1) {
+      stat <- as.data.frame(tibble(
+        'nbr.val' = 1,
+        'nbr.null' = 0,
+        'nbr.na' = 0,
+        'min' = valueVector[1],
+        'max' = valueVector[1],
+        'range' = 0,
+        'sum' = valueVector[1],
+        'median' = valueVector[1],
+        'mean' = valueVector[1],
+        'SE.mean' = 0,
+        'CI.mean.0.95' = 0,
+        'var' = 0,
+        'std.dev' = 0,
+        'coef.var' = 0
+      ))
+    } else {
+      print("stat.desc")
+      stat <- as.data.frame(stat.desc(valueVector, basic=TRUE)) # pastecs
+      print("/stat.desc")
     }
       
-    if (field == "saturation2_europeana_dc_type_taggedLiterals") {
-      print("valueVector")
-      print(valueVector)
-      print("nonNAs")
-      print(nonNAs)
-      print("dim")
-      print(dim(valueVector))
-    }
-    
-    print("stat.desc")
-    stat <- as.data.frame(stat.desc(valueVector, basic=TRUE)) # pastecs
-    print("/stat.desc")
-
     if (field == "saturation2_europeana_dc_type_taggedLiterals") {
       print(stat)
     }
