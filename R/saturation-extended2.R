@@ -219,6 +219,9 @@ if (opt$produceJson) {
     print("length")
     nonNAs <- length(valueVector)
     print(paste("nonNAs", nonNAs))
+    if (nonNAs == 0) {
+      print(valueVector)
+    }
     
     print("stat.desc")
     stat <- as.data.frame(stat.desc(valueVector, basic=TRUE)) # pastecs
