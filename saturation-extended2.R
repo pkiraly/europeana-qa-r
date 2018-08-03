@@ -255,7 +255,9 @@ if (opt$produceJson) {
   stats <- stats[,colnames(stats) != 'dummy']
   stats <- data.frame(t(stats))
   exportJson <- toJSON(stats)
-  write(exportJson, paste(jsonOutputDir, '/', id, '/', id, ".saturation.json", sep=""))
+  jsonFileName <- paste0(jsonOutputDir, '/', id, '/', id, ".saturation.json", sep="");
+  print(paste(path, "writing to", jsonFileName, format(Sys.time(), "%H:%M:%OS3")))
+  write(exportJson, jsonFileName)
   rm(stats)
 
   print(paste(path, "histograms"))
@@ -277,7 +279,9 @@ if (opt$produceJson) {
     histograms[[tolower(name)]] <- hist
   }
   exportJson <- toJSON(histograms)
-  write(exportJson, paste(jsonOutputDir, '/', id, '/', id, ".saturation.histogram.json", sep=""))
+  jsonFileName <- paste0(jsonOutputDir, '/', id, '/', id, ".saturation.histogram.json")
+  print(paste(path, "writing to", jsonFileName, format(Sys.time(), "%H:%M:%OS3")))
+  write(exportJson, jsonFileName)
   rm(histograms)
   
   print(paste(path, "normalized histograms", format(Sys.time(), "%H:%M:%OS3")))
@@ -301,9 +305,9 @@ if (opt$produceJson) {
     histograms[[tolower(name)]] <- hist
   }
   exportJson <- toJSON(histograms)
-  fileName <- paste0(jsonOutputDir, '/', id, '/', id, ".saturation.normalized-histogram.json")
-  print(paste(path, 'saving', fileName, format(Sys.time(), "%H:%M:%OS3")))
-  write(exportJson, fileName)
+  jsonFileName <- paste0(jsonOutputDir, '/', id, '/', id, ".saturation.normalized-histogram.json")
+  print(paste(path, 'writing to', jsonFileName, format(Sys.time(), "%H:%M:%OS3")))
+  write(exportJson, jsonFileName)
   rm(histograms)
 
   print(paste(path, "frequency table"))
@@ -323,7 +327,7 @@ if (opt$produceJson) {
   }
   exportJson <- toJSON(frequencyTable)
   jsonFileName <- paste0(jsonOutputDir, '/', id, '/', id, '.saturation.frequency.table.json');
-  print(paste(path, 'saving', jsonFileName))
+  print(paste(path, "writing to", jsonFileName, format(Sys.time(), "%H:%M:%OS3")))
   write(exportJson, jsonFileName)
   rm(frequencyTable)
   rm(jsonFileName)

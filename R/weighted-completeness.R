@@ -1,16 +1,19 @@
-library(readr)
-library(pastecs)
-library(ggplot2)
-library(grid)
-library(gridExtra)
-library(jsonlite)
-library(plyr)
-library(psych)
-library(optparse)
-source("readOptions.R")
-source("draw2.R")
+library(readr, warn.conflicts = FALSE, quietly = TRUE, verbose = FALSE)
+library(pastecs, warn.conflicts = FALSE, quietly = TRUE, verbose = FALSE)
+library(ggplot2, warn.conflicts = FALSE, quietly = TRUE, verbose = FALSE)
+library(grid, warn.conflicts = FALSE, quietly = TRUE, verbose = FALSE)
+library(gridExtra, warn.conflicts = FALSE, quietly = TRUE, verbose = FALSE)
+library(jsonlite, warn.conflicts = FALSE, quietly = TRUE, verbose = FALSE)
+library(plyr, warn.conflicts = FALSE, quietly = TRUE, verbose = FALSE)
+library(psych, warn.conflicts = FALSE, quietly = TRUE, verbose = FALSE)
+library(optparse, warn.conflicts = FALSE, quietly = TRUE, verbose = FALSE)
+source("R/readOptions.R")
+source("R/draw2.R")
 
-jsonOutputDir <- 'json2'
+jsonOutputDir <- opt$outputDir
+if (!file.exists(jsonOutputDir)) {
+  stop(paste('output dir:', jsonOutputDir, "does not exist"))
+}
 startTime <- proc.time()
 
 path <- getFile(opt$inputFile)

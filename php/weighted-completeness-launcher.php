@@ -4,8 +4,16 @@
  *   ./prepare.sh saturation
  */
 
+define('OUTPUT_DIRECTORY', 'json-2018-03');
 define('MAX_THREADS', 7);
 define('SET_FILE_NAME', 'setlist.txt');
+define('CMD_TEMPLATE', 'nohup Rscript weighted-completeness.R --inputFile %s %s >>r-report.log 2>>r-report.log &');
+
+$parameters = [
+  '--outputDirectory ' . OUTPUT_DIRECTORY,
+  '--produceJson T'
+];
+$all_parameters = join($parameters, ' ');
 
 $Rfile = 'weighted-completeness.R';
 $endTime = time() + 60;
@@ -22,7 +30,7 @@ while (time() < $endTime) {
 }
 
 function launch_threads($running_threads) {
-  global $Rfile;
+  global $all_parameters;
 
   if (filesize(SET_FILE_NAME) > 3) {
     $contents = file_get_contents(SET_FILE_NAME);
@@ -39,7 +47,9 @@ function launch_threads($running_threads) {
     file_put_contents('setlist.txt', $contents);
     foreach ($files as $file) {
       printf("%s launching set: %s, remaining sets: %d\n", date("Y-m-d H:i:s"), $file, count($lines));
-      exec('nohup Rscript ' . $Rfile . ' --inputFile ' . $file . ' --produceJson T >>r-report.log 2>>r-report.log &');
+      $cmd = sprintf(CMD_TEMPLATE, $file, $all_parameters);
+      // echo $cmd, "\n";
+      exec($cmd);
     }
   }
 }
