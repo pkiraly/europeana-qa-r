@@ -191,12 +191,17 @@ sum <- nrow(qa)
 
 print(paste(path, 'total records:', sum))
 
+ow <- options("warn")
+print('warnings')
+warnings()
+options(ow) # reset
+print('/warnings')
+
 # fieldName <- 'saturation2_TaggedLiterals_per_Language_in_Object'
 # ... do some test here on qa[fieldName > -1, fieldName] ...
 # stopQuietly()
 
 if (opt$produceJson) {
-  ow <- options("warn")
 
   print(paste(path, "basic statistics"))
   stat_names <- c(saturation_fields, generic_fields) #c(saturation_fields, top_fields)
