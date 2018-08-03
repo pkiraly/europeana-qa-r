@@ -221,6 +221,10 @@ if (opt$produceJson) {
       valueVector <- c(-1, -1, -1)
     }
     
+    if (field == "saturation2_europeana_dc_type_taggedLiterals") {
+      print(valueVector)
+    }
+    
     print("stat.desc")
     stat <- as.data.frame(stat.desc(valueVector, basic=TRUE)) # pastecs
     print("/stat.desc")
