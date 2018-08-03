@@ -214,11 +214,8 @@ if (opt$produceJson) {
     valueVector <- qa %>% 
       filter(field > -1) %>% 
       pull(field)
-    # print("valueVector")
     valueVector <- valueVector[valueVector > -1]
-    # print("length")
     nonNAs <- length(valueVector)
-    # print(paste("nonNAs", nonNAs))
     if (nonNAs == 0) {
       valueVector <- c(-1, -1, -1)
     }
