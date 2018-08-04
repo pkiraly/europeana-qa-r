@@ -6,7 +6,7 @@
 define('OUTPUT_DIRECTORY', 'json-2018-03');
 define('MAX_THREADS', 10);
 define('SET_FILE_NAME', 'setlist.txt');
-define('CMD_TEMPLATE', 'nohup Rscript R/get-histograms-and-stats2.R --inputFile %s %s >>r-report.log 2>>r-report.log &');
+define('CMD_TEMPLATE', 'nohup Rscript R/completeness.R --inputFile %s %s >>r-report.log 2>>r-report.log &');
 
 $parameters = [
   '--outputDirectory ' . OUTPUT_DIRECTORY,
@@ -23,7 +23,7 @@ $all_parameters = join($parameters, ' ');
 $endTime = time() + 60;
 $i = 1;
 while (time() < $endTime) {
-  $threads = exec('ps aux | grep "[=]R/get-histograms-and-stats2.R" | wc -l');
+  $threads = exec('ps aux | grep "[=]R/completeness.R" | wc -l');
   # echo 'threads: ', $threads, "\n";
   if ($threads < MAX_THREADS) {
     if (filesize(SET_FILE_NAME) > 3) {
@@ -52,7 +52,7 @@ function launch_threads($running_threads) {
     foreach ($files as $file) {
       printf("%s launching set: %s, remaining sets: %d\n", date("Y-m-d H:i:s"), $file, count($lines));
       $cmd = sprintf(CMD_TEMPLATE, $file, $all_parameters);
-      // echo $cmd, "\n";
+      echo $cmd, "\n";
       exec($cmd);
     }
   }
