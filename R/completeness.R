@@ -155,6 +155,7 @@ if (opt$produceJson && opt$calculateBasicStatistics) {
   stat_names <- c(completeness_fields, cardinality_fields, problem_fields)
   for (field in stat_names) {
     print(field)
+    print(qa[,field])
     stat.desc(qa[,field], basic=TRUE)
   }
   stats <- round(stat.desc(qa[,stat_names], basic=TRUE), digits=4)
