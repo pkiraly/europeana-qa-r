@@ -256,6 +256,7 @@ if (opt$produceJson) {
     } else {
       print("stat.desc")
       stat <- as.data.frame(stat.desc(valueVector, basic=TRUE)) # pastecs
+      print(stat)
       print("/stat.desc")
     }
 
