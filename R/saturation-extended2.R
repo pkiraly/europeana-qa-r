@@ -278,9 +278,16 @@ if (opt$produceJson) {
 
     # quantiles
     print("quantiles")
-    quantiles <- as.data.frame(quantile(valueVector))
-    stat[c('Q1'),1] <- quantiles[2,1]
-    stat[c('Q3'),1] <- quantiles[4,1]
+    if (nonNAs == 0 || nonNAs == 1) {
+      quantiles2 <- valueVector[1]
+      quantiles4 <- valueVector[1]
+    } else {
+      quantiles <- as.data.frame(quantile(valueVector))
+      quantiles2 <- quantiles[2,1]
+      quantiles4 <- quantiles[4,1]
+    }
+    stat[c('Q1'),1] <- quantiles2
+    stat[c('Q3'),1] <- quantiles4
     
     # other statistics
     print("other statistics")
