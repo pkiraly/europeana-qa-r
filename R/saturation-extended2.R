@@ -299,6 +299,7 @@ if (opt$produceJson) {
     stat[c('mad'),1] <- desc$mad[1]
     stat[c('kurtosis'),1] <- desc$kurtosis[1]
     
+    print("names after other statistics")
     print(names(stat))
     
     # outliers
@@ -311,6 +312,9 @@ if (opt$produceJson) {
     stat[c('boxplot.out.perc'),1] <- length(boxplot$out) / boxplot$n * 100
     stat[c('boxplot.out.upper.n'),1] <- length(boxplot$out[boxplot$out > boxplot$stats[5]])
     stat[c('boxplot.out.lower.n'),1] <- length(boxplot$out[boxplot$out < boxplot$stats[1]])
+
+    print("names after outliers")
+    print(names(stat))
     
     print("stat")
     print(stat)
