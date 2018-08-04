@@ -33,6 +33,8 @@ ifelse(
   FALSE
 )
 
+ow <- options("warn" = 2)
+
 print(paste(path, 'file:', file))
 print(paste(path, 'id:', id))
 print(paste(path, 'draw completeness graph:', opt$drawCompletenessGraph))
