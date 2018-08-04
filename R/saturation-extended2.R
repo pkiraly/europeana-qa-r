@@ -220,7 +220,7 @@ if (opt$produceJson) {
     if (nonNAs == 0) {
       print("is nonNAs 0")
       valueVector <- c(-1)
-      stat <- as.data.frame(tibble(
+      stat <- as.data.frame(t(tibble(
         'nbr.val' = 1,
         'nbr.null' = 0,
         'nbr.na' = 0,
@@ -235,9 +235,9 @@ if (opt$produceJson) {
         'var' = 0,
         'std.dev' = 0,
         'coef.var' = 0
-      ))
+      )))
     } else if (nonNAs == 1) {
-      stat <- as.data.frame(tibble(
+      stat <- as.data.frame(t(tibble(
         'nbr.val' = 1,
         'nbr.null' = 0,
         'nbr.na' = 0,
@@ -252,7 +252,7 @@ if (opt$produceJson) {
         'var' = 0,
         'std.dev' = 0,
         'coef.var' = 0
-      ))
+      )))
     } else {
       print("stat.desc")
       stat <- as.data.frame(stat.desc(valueVector, basic=TRUE)) # pastecs
