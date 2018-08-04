@@ -311,7 +311,9 @@ if (opt$produceJson) {
     stat[c('boxplot.out.lower.n'),1] <- length(boxplot$out[boxplot$out < boxplot$stats[1]])
     
     print("stat")
+    print(stat)
     stat <- data.frame(stat[!names(stat) %in% removable_stats])
+    print(stat)
     print("colnames")
     colnames(stat) <- tolower(field)
 
