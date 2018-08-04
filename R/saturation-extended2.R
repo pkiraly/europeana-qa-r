@@ -210,7 +210,7 @@ if (opt$produceJson) {
   stats <- read.table(text = "1\n1\n1\n1\n1\n1\n1\n1\n1\n1\n1\n1\n1\n1\n1\n1\n1\n1\n1\n1\n1\n1\n1\n1\n1\n1\n1\n1", 
                       colClasses = c('character'), col.names = c('dummy'))
   for (field in stat_names) {
-    print(paste("field:", field))
+    # print(paste("field:", field))
     valueVector <- qa %>% 
       filter(field > -1) %>% 
       pull(field)
@@ -218,7 +218,6 @@ if (opt$produceJson) {
     nonNAs <- length(valueVector)
     
     if (nonNAs == 0) {
-      print("is nonNAs 0")
       valueVector <- c(-1)
       stat <- as.data.frame(t(tibble(
         'nbr.val' = 1,
