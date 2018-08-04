@@ -52,7 +52,7 @@ function launch_threads($running_threads) {
     foreach ($files as $file) {
       printf("%s launching set: %s, remaining sets: %d\n", date("Y-m-d H:i:s"), $file, count($lines));
       $cmd = sprintf(CMD_TEMPLATE, $file, $all_parameters);
-      echo $cmd, "\n";
+      // echo $cmd, "\n";
       exec($cmd);
     }
   }
