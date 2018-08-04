@@ -153,6 +153,10 @@ if (opt$produceJson && opt$calculateBasicStatistics) {
   print(paste(path, "basic statistics"))
   # stat_names <- c(completeness_fields, cardinality_fields, problem_fields, entropy_fields)
   stat_names <- c(completeness_fields, cardinality_fields, problem_fields)
+  for (field in stat_names) {
+    print(field)
+    stat.desc(qa[,field], basic=TRUE)
+  }
   stats <- round(stat.desc(qa[,stat_names], basic=TRUE), digits=4)
   print('here')
   names(stats) <- tolower(names(stats))
