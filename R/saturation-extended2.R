@@ -254,16 +254,7 @@ if (opt$produceJson) {
         'coef.var' = 0
       )))
     } else {
-      print("stat.desc")
       stat <- as.data.frame(stat.desc(valueVector, basic=TRUE)) # pastecs
-      print(stat)
-      print("/stat.desc")
-    }
-
-    if (field == "saturation2_europeana_dc_title_taggedLiterals") {
-      print("stat.desc")
-      print(stat)
-      print("/stat.desc")
     }
 
     # min/max record id
@@ -280,11 +271,7 @@ if (opt$produceJson) {
     stat[c('recMin'),1] <- recMin
     stat[c('recMax'),1] <- recMax
 
-    print('stat after recmin/recmax')
-    print(stat)
-    
     # quantiles
-    print("quantiles")
     # if (nonNAs == 0 || nonNAs == 1) {
     #   quantiles2 <- valueVector[1]
     #   quantiles4 <- valueVector[1]
@@ -297,19 +284,13 @@ if (opt$produceJson) {
     stat[c('Q3'),1] <- quantiles4
     
     # other statistics
-    print("other statistics")
     desc <- as.data.frame(describe(valueVector)) #psych
     stat[c('trimmedMean'),1] <- desc$trimmed[1]
     stat[c('skew'),1] <- desc$skew[1]
     stat[c('mad'),1] <- desc$mad[1]
     stat[c('kurtosis'),1] <- desc$kurtosis[1]
     
-    print("names after other statistics")
-    print(names(stat))
-    print(stat)
-    
     # outliers
-    print("outliers")
     boxplot <- boxplot.stats(valueVector)
     stat[c('boxplot.lower'),1] <- boxplot$stats[1]
     stat[c('boxplot.upper'),1] <- boxplot$stats[5]
@@ -319,20 +300,9 @@ if (opt$produceJson) {
     stat[c('boxplot.out.upper.n'),1] <- length(boxplot$out[boxplot$out > boxplot$stats[5]])
     stat[c('boxplot.out.lower.n'),1] <- length(boxplot$out[boxplot$out < boxplot$stats[1]])
 
-    print("names after outliers")
-    print(names(stat))
-    
-    print("stat")
-    print(stat)
     stat <- data.frame(stat[!names(stat) %in% removable_stats])
-    print(stat)
-    print("colnames")
     colnames(stat) <- tolower(field)
 
-    print('colnames:')
-    print(colnames(stat))
-
-    print("cbind")
     stats <- cbind(stats, stat)
   }
   stats <- stats[,colnames(stats) != 'dummy']
