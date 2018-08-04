@@ -316,7 +316,7 @@ if (opt$produceJson) {
     colnames(stat) <- tolower(field)
 
     print("cbind")
-    print(names(stat))
+    print(colnames(stat))
     stats <- cbind(stats, stat)
   }
   stats <- stats[,colnames(stats) != 'dummy']
