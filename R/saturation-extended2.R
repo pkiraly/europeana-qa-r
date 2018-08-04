@@ -260,7 +260,9 @@ if (opt$produceJson) {
     }
       
     if (field == "saturation2_europeana_dc_type_taggedLiterals") {
+      print("stat.desc")
       print(stat)
+      print("/stat.desc")
     }
     # min/max record id
     if (nonNAs == 0) {
