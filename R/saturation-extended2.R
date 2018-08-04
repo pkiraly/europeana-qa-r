@@ -278,6 +278,9 @@ if (opt$produceJson) {
     stat[c('recMin'),1] <- recMin
     stat[c('recMax'),1] <- recMax
 
+    print('stat after recmin/recmax')
+    print(stat)
+    
     # quantiles
     print("quantiles")
     # if (nonNAs == 0 || nonNAs == 1) {
@@ -301,6 +304,7 @@ if (opt$produceJson) {
     
     print("names after other statistics")
     print(names(stat))
+    print(stat)
     
     # outliers
     print("outliers")
