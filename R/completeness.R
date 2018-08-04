@@ -63,7 +63,6 @@ if (opt$produceJson) {
   collector[["count"]][['count']] <- sum
   exportJson <- toJSON(count)
   jsonFileName <- paste0(jsonOutputDir, '/', id, '/', id, ".count.json")
-  paste0(jsonOutputDir, '/', id, '/', id, ".saturation.json", sep="");
   print(paste(path, "writing to", jsonFileName, format(Sys.time(), "%H:%M:%OS3")))
   write(exportJson, jsonFileName)
   rm(count)
@@ -196,8 +195,9 @@ if (opt$produceJson && opt$calculateHistograms) {
   rm(jsonFileName)
   
   exportJson <- toJSON(collector)
+  jsonFileName <- paste0(jsonOutputDir, '/', id, '/', id, ".collector.json")
   print(paste(path, "writing to", jsonFileName, format(Sys.time(), "%H:%M:%OS3")))
-  write(exportJson, paste(jsonOutputDir, '/', id, '/', id, ".collector.json", sep=""))
+  write(exportJson, jsonFileName)
   rm(collector)
 }
 
