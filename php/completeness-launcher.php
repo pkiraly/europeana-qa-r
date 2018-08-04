@@ -13,10 +13,10 @@ $parameters = [
   '--drawCompletenessGraph F',
   '--drawEntropyGraph F',
   '--produceJson T',
-  '--calculateExistence F',
-  '--calculateCardinalities F',
-  '--calculateFrequencyTables F',
-  '--calculateBasicStatistics F'
+  '--calculateExistence T',
+  '--calculateCardinalities T',
+  '--calculateFrequencyTables T',
+  '--calculateBasicStatistics T'
 ];
 $all_parameters = join($parameters, ' ');
 
