@@ -62,7 +62,10 @@ if (opt$produceJson) {
   count <- data.frame(count)
   collector[["count"]][['count']] <- sum
   exportJson <- toJSON(count)
-  write(exportJson, paste(jsonOutputDir, '/', id, '/', id, ".count.json", sep=""))
+  jsonFileName <- paste0(jsonOutputDir, '/', id, '/', id, ".count.json")
+  paste0(jsonOutputDir, '/', id, '/', id, ".saturation.json", sep="");
+  print(paste(path, "writing to", jsonFileName, format(Sys.time(), "%H:%M:%OS3")))
+  write(exportJson, jsonFileName)
   rm(count)
 }
 
@@ -89,7 +92,9 @@ if (opt$produceJson && opt$calculateExistence) {
   }
   collector[["frequencies"]] <- frequencies
   exportJson <- toJSON(frequencies)
-  write(exportJson, paste(jsonOutputDir, '/', id, '/', id, ".freq.json", sep=""))
+  jsonFileName <- paste0(jsonOutputDir, '/', id, '/', id, ".freq.json")
+  print(paste(path, "writing to", jsonFileName, format(Sys.time(), "%H:%M:%OS3")))
+  write(exportJson, jsonFileName)
   rm(frequencies)
 }
 # ENDS field existency process
@@ -112,7 +117,9 @@ if (opt$produceJson && opt$calculateCardinalities) {
   }
   collector[["cardinalities"]] <- cardinalities
   exportJson <- toJSON(cardinalities)
-  write(exportJson, paste(jsonOutputDir, '/', id, '/', id, ".cardinality.json", sep=""))
+  jsonFileName <- paste0(jsonOutputDir, '/', id, '/', id, ".cardinality.json")
+  print(paste(path, "writing to", jsonFileName, format(Sys.time(), "%H:%M:%OS3")))
+  write(exportJson, jsonFileName)
   rm(cardinalities)
 }
 # ENDS field cardinality process
@@ -136,6 +143,7 @@ if (opt$produceJson && opt$calculateFrequencyTables) {
   collector[["frequencyTable"]] <- frequencyTable
   exportJson <- toJSON(frequencyTable)
   jsonFileName <- paste0(jsonOutputDir, '/', id, '/', id, '.frequency.table.json');
+  print(paste(path, "writing to", jsonFileName, format(Sys.time(), "%H:%M:%OS3")))
   write(exportJson, jsonFileName)
   rm(frequencyTable)
   rm(jsonFileName)
@@ -157,7 +165,9 @@ if (opt$produceJson && opt$calculateBasicStatistics) {
   }
   collector[["stats"]] <- stats
   exportJson <- toJSON(stats)
-  write(exportJson, paste(jsonOutputDir, '/', id, '/', id, ".json", sep=""))
+  jsonFileName <- paste0(jsonOutputDir, '/', id, '/', id, ".json")
+  print(paste(path, "writing to", jsonFileName, format(Sys.time(), "%H:%M:%OS3")))
+  write(exportJson, jsonFileName)
   rm(stats)
 }
 
@@ -180,11 +190,13 @@ if (opt$produceJson && opt$calculateHistograms) {
   collector[["histograms"]] <- histograms
   exportJson <- toJSON(histograms)
   jsonFileName <- paste0(jsonOutputDir, '/', id, '/', id, ".hist.json")
+  print(paste(path, "writing to", jsonFileName, format(Sys.time(), "%H:%M:%OS3")))
   write(exportJson, jsonFileName)
   rm(histograms)
   rm(jsonFileName)
   
   exportJson <- toJSON(collector)
+  print(paste(path, "writing to", jsonFileName, format(Sys.time(), "%H:%M:%OS3")))
   write(exportJson, paste(jsonOutputDir, '/', id, '/', id, ".collector.json", sep=""))
   rm(collector)
 }
