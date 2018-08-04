@@ -310,8 +310,10 @@ if (opt$produceJson) {
     
     print("stat")
     stat <- data.frame(stat[!names(stat) %in% removable_stats])
+    print("colnames")
     colnames(stat) <- tolower(field)
 
+    print("cbind")
     stats <- cbind(stats, stat)
   }
   stats <- stats[,colnames(stats) != 'dummy']
