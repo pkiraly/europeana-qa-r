@@ -297,6 +297,8 @@ if (opt$produceJson) {
     stat[c('mad'),1] <- desc$mad[1]
     stat[c('kurtosis'),1] <- desc$kurtosis[1]
     
+    print(names(stat))
+    
     # outliers
     print("outliers")
     boxplot <- boxplot.stats(valueVector)
@@ -314,7 +316,7 @@ if (opt$produceJson) {
     colnames(stat) <- tolower(field)
 
     print("cbind")
-    print(stat)
+    print(names(stat))
     stats <- cbind(stats, stat)
   }
   stats <- stats[,colnames(stats) != 'dummy']
