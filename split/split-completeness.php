@@ -1,16 +1,30 @@
 <?php
+require_once('options.php');
+
+$opts = make_options([
+  'f:' => 'fileName:',
+  'd:' => 'outputDir:'
+]);
+$options = getopt($opts[0], $opts[1]);
 
 $start = microtime(TRUE);
-$fileName = $argv[1];
+$fileName = $options['fileName'];
+if (!file_exists($fileName))
+  die("The input file ($fileName) is not existing.\n");
+
+// '/projects/pkiraly/2018-03-23/split/completeness';
+$dir = $options['outputDir'];
+if (!file_exists($dir))
+  die("The output dir ($dir) is not existing.\n");
+
 $in = fopen($fileName, "r");
-$dir = '/projects/pkiraly/2018-03-23/split/completeness';
 $out = [];
 $intersections = ['c' => [], 'd' => []];
 $ln = 1;
 while (($line = fgets($in)) != false) {
   if (strpos($line, ',') != false) {
     if ($ln++ % 100000 == 0) {
-      echo number_format($ln), ' ';
+      echo number_format($ln, 0, '.', '.'), ' ';
     }
     $row = str_getcsv($line);
     $c = $row[1];

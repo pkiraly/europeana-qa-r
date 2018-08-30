@@ -12,7 +12,7 @@
  */
 
 define('OUTPUT_DIRECTORY', 'json-2018-03');
-define('MAX_THREADS', 7);
+define('MAX_THREADS', 10);
 define('SET_FILE_NAME', 'setlist.txt');
 define('CMD_TEMPLATE', 'nohup Rscript R/saturation-extended2.R --inputFile %s %s >>r-report.log 2>>r-report.log &');
 
@@ -58,7 +58,7 @@ function launch_threads($running_threads) {
     foreach ($files as $file) {
       printf("%s launching set: %s, remaining sets: %d\n", date("Y-m-d H:i:s"), $file, count($lines));
       $cmd = sprintf(CMD_TEMPLATE, $file, $all_parameters);
-      echo $cmd, "\n";
+      // echo $cmd, "\n";
       exec($cmd);
     }
   }
