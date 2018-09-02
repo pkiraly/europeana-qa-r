@@ -13,12 +13,14 @@ source("R/completeness-field-definitions.R")
 source("R/draw2.R")
 
 jsonOutputDir <- opt$outputDir
+# jsonOutputDir <- "test-data/json"
 if (!file.exists(jsonOutputDir)) {
   stop(paste('output dir:', jsonOutputDir, "does not exist"))
 }
 startTime <- proc.time()
 
 path <- getFile(opt$inputFile)
+# path <- getFile("test-data/c1781.csv")
 if (!file.exists(path)) {
   stop(paste('path:', path, "does not exist"))
 }
@@ -153,12 +155,36 @@ if (opt$produceJson && opt$calculateBasicStatistics) {
   print(paste(path, "basic statistics"))
   # stat_names <- c(completeness_fields, cardinality_fields, problem_fields, entropy_fields)
   stat_names <- c(completeness_fields, cardinality_fields, problem_fields)
-  # for (field in stat_names) {
-    # print(field)
-    # print(qa[,field])
-    # stat.desc(qa[,field], basic=TRUE)
-  # }
-  stats <- round(stat.desc(qa[,stat_names], basic=TRUE), digits=4)
+  print(sum)
+  if (sum == 1) {
+    stats <- read.table(
+      text = "1\n1\n1\n1\n1\n1\n1\n1\n1\n1", 
+      colClasses = c('character'), col.names = c('dummy'))
+    for (field in stat_names) {
+      valueVector <- qa %>% 
+        filter(field > -1) %>% 
+        pull(field)
+
+      stat <- as.data.frame(t(tibble(
+        'min' = valueVector[1],
+        'max' = valueVector[1],
+        'range' = 0,
+        'median' = valueVector[1],
+        'mean' = valueVector[1],
+        'SE.mean' = 0,
+        'CI.mean.0.95' = 0,
+        'var' = 0,
+        'std.dev' = 0,
+        'coef.var' = 0
+      )))
+      colnames(stat) <- tolower(field)
+      stats <- cbind(stats, stat)
+    }
+    stats <- stats[,colnames(stats) != 'dummy']
+    # stats <- data.frame(t(stats))
+  } else {
+    stats <- round(stat.desc(qa[,stat_names], basic=TRUE), digits=4)
+  }
   # print('here')
   names(stats) <- tolower(names(stats))
 
