@@ -12,7 +12,7 @@ $fileName = $options['fileName'];
 if (!file_exists($fileName))
   die("The input file ($fileName) is not existing.\n");
 
-// '/projects/pkiraly/2018-03-23/split/saturation';
+// '/projects/pkiraly/2018-03-23/split/multilinguality';
 $dir = $options['outputDir'];
 if (!file_exists($dir))
   die("The output dir ($dir) is not existing.\n");
