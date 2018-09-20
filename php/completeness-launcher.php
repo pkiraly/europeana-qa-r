@@ -3,7 +3,7 @@
  * cp master-setlist.txt setlist.txt
  */
 
-define('OUTPUT_DIRECTORY', 'json-2018-03');
+define('OUTPUT_DIRECTORY', '/projects/pkiraly/europeana-qa-data/v2018-03/json');
 define('MAX_THREADS', 10);
 define('SET_FILE_NAME', 'setlist.txt');
 define('CMD_TEMPLATE', 'nohup Rscript R/completeness.R --inputFile %s %s >>r-report.log 2>>r-report.log &');

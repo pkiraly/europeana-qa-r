@@ -11,7 +11,7 @@
  *   watch './running-status.sh saturation'
  */
 
-define('OUTPUT_DIRECTORY', 'json-2018-03');
+define('OUTPUT_DIRECTORY', '/projects/pkiraly/europeana-qa-data/v2018-08/json');
 define('MAX_THREADS', 10);
 define('SET_FILE_NAME', 'setlist.txt');
 define('CMD_TEMPLATE', 'nohup Rscript R/saturation-extended2.R --inputFile %s %s >>r-report.log 2>>r-report.log &');
