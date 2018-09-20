@@ -14,7 +14,7 @@
 define('OUTPUT_DIRECTORY', '/projects/pkiraly/europeana-qa-data/v2018-08/json');
 define('MAX_THREADS', 10);
 define('SET_FILE_NAME', 'setlist.txt');
-define('CMD_TEMPLATE', 'nohup Rscript R/saturation-extended2.R --inputFile %s %s >>r-report.log 2>>r-report.log &');
+define('CMD_TEMPLATE', 'nohup Rscript R/multilinguality.R --inputFile %s %s >>r-report.log 2>>r-report.log &');
 
 $parameters = [
   '--outputDirectory ' . OUTPUT_DIRECTORY,
@@ -25,7 +25,7 @@ $parameters = [
 ];
 $all_parameters = join($parameters, ' ');
 
-$Rfile = 'R/saturation-extended2.R';
+$Rfile = 'R/multilinguality.R';
 $endTime = time() + 60;
 $i = 1;
 while (time() < $endTime) {
